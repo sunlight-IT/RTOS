@@ -31,8 +31,8 @@
 
 /* Scheduler includes. */
 #include "FreeRTOS.h"
-#include "gpio.h"
 #include "task.h"
+
 /* For backward compatibility, ensure configKERNEL_INTERRUPT_PRIORITY is
 defined.  The value should also ensure backward compatibility.
 FreeRTOS.org versions prior to V4.4.0 did not include this definition. */
@@ -257,6 +257,7 @@ static void prvPortStartFirstTask(void) {
 BaseType_t xPortStartScheduler(void) {
     /* configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to 0.
     See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html */
+
     configASSERT(configMAX_SYSCALL_INTERRUPT_PRIORITY);
 
 #if (configASSERT_DEFINED == 1)
@@ -288,6 +289,7 @@ BaseType_t xPortStartScheduler(void) {
         /* Calculate the maximum acceptable priority group value for the number
         of bits read back. */
         ulMaxPRIGROUPValue = portMAX_PRIGROUP_BITS;
+
         while ((ucMaxPriorityValue & portTOP_BIT_OF_BYTE) == portTOP_BIT_OF_BYTE) {
             ulMaxPRIGROUPValue--;
             ucMaxPriorityValue <<= (uint8_t)0x01;
@@ -298,6 +300,7 @@ BaseType_t xPortStartScheduler(void) {
             /* Check the CMSIS configuration that defines the number of
             priority bits matches the number of priority bits actually queried
             from the hardware. */
+
             configASSERT((portMAX_PRIGROUP_BITS - ulMaxPRIGROUPValue) == __NVIC_PRIO_BITS);
         }
 #endif
@@ -359,7 +362,6 @@ void vPortEndScheduler(void) {
 
 void vPortEnterCritical(void) {
     portDISABLE_INTERRUPTS();
-    
     uxCriticalNesting++;
 
     /* This is not the interrupt safe version of the enter critical function so

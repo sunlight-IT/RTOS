@@ -106,7 +106,6 @@ void MX_FREERTOS_Init(void) {
 
     /* Create the thread(s) */
     /* definition and creation of defaultTask */
-
     osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
     defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
@@ -122,7 +121,7 @@ void MX_FREERTOS_Init(void) {
  * @retval None
  */
 /* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const *argument) {
+__weak void StartDefaultTask(void const *argument) {
     /* USER CODE BEGIN StartDefaultTask */
     /* Infinite loop */
     for (;;) {

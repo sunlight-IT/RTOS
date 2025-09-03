@@ -35,7 +35,12 @@
         "cmsis_armcc.h": "c",
         "core.h": "c",
         "gpio.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "zlog.h": "c",
+        "usart.h": "c",
+        "stdarg.h": "c",
+        "my_log.h": "c",
+        "ztask.h": "c"
     },
     "C_Cpp.default.compilerPath": "E:/app_tool/VSCODE/Mingw-W64/mingw64/bin/gcc.exe",
     "C_Cpp.default.intelliSenseMode": "gcc-arm",

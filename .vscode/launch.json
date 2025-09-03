@@ -14,7 +14,7 @@
             "servertype": "openocd",
             "configFiles": [
                 "D:/APP/OpenoCD/xpack-openocd-0.12.0-6/openocd/scripts/interface/stlink-v2.cfg",
-                "D:/APP/OpenoCD/xpack-openocd-0.12.0-6/openocd/scripts/target/stm32f103.cfg"
+                "D:/APP/OpenoCD/xpack-openocd-0.12.0-6/openocd/scripts/target/stm32f1x.cfg"
             ]
         }
     ]

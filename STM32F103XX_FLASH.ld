@@ -16,7 +16,7 @@
 **
 **  Target      : STMicroelectronics STM32
 **
-**  Distribution: The file is distributed “as is,�? without any warranty
+**  Distribution: The file is distributed “as is,�? without any warranty
 **                of any kind.
 **
 *****************************************************************************

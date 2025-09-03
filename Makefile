@@ -71,7 +71,8 @@ Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/port.c \
 Core/Src/sysmem.c \
 Core/Src/syscalls.c  \
-Usr/core.c
+Usr/core.c  \
+Usr/log/my_log.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -150,7 +151,8 @@ C_INCLUDES =  \
 -IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3 \
 -IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
 -IDrivers/CMSIS/Include \
--IUsr/
+-IUsr  \
+-IUsr/log
 
 
 # compile gcc flags
