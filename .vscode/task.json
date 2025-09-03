@@ -1,0 +1,29 @@
+
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make",
+            "args": [
+            ],
+            "group": "build"
+        },
+        {
+            "label": "download",
+            "type": "shell",
+            "command": "openocd",
+            "args": [
+                "-f",
+                "stlink-v2.cfg",
+                "-f",
+                "stm32f1x.cfg",
+                "-c",
+                "program build/stm32h7_demo.elf verify reset exit"
+            ],
+            "group": "build"
+        }
+    ]
+}
+
