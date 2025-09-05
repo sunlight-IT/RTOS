@@ -2,6 +2,7 @@
 
 #include <stdarg.h>
 
+#include "cmsis_os.h"
 #include "usart.h"
 
 // #ifdef __GNUC__
@@ -16,10 +17,11 @@
 //   return ch;
 // }
 
+// static char buff_str[512];
 void zlog(const char* fmt, ...) {
     int strlen = 0;
-    char buff_str[128];
-
+    char buff_str[64];
+    // char buff_str[256]; 会导致溢出，而且无法打印，64就可以正常打印
     /* rtos要用信号量锁住*/
     va_list args;
     va_start(args, fmt);
