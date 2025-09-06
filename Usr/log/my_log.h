@@ -16,3 +16,5 @@ void zlog(const char* fmt, ...);
     zlog("[%09lu] [EROR] <%-20s> : " fmt " \r\n", HAL_GetTick(), __func__, ##__VA_ARGS__)
 
 #define vofa_LOGI(TYPE, fmt, ...) printf(" %s:" fmt "\n", TYPE, ##__VA_ARGS__)
+
+void zlog_init(void);

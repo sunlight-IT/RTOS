@@ -41,7 +41,8 @@
         "stdarg.h": "c",
         "my_log.h": "c",
         "ztask.h": "c",
-        "app_led.h": "c"
+        "app_led.h": "c",
+        "type_traits": "c"
     },
     "C_Cpp.default.compilerPath": "E:/app_tool/VSCODE/Mingw-W64/mingw64/bin/gcc.exe",
     "C_Cpp.default.intelliSenseMode": "gcc-arm",

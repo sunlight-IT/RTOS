@@ -154,7 +154,7 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Include \
 -IUsr  \
 -IUsr/log \
--IUsr/app_led
+-IUsr/app
 
 
 # compile gcc flags
