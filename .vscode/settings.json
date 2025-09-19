@@ -44,7 +44,11 @@
         "app_led.h": "c",
         "type_traits": "c",
         "event.h": "c",
-        "zthread.h": "c"
+        "zthread.h": "c",
+        "memory_detection.h": "c",
+        "tick.h": "c",
+        "debug_liget.h": "c",
+        "component.h": "c"
     },
     "C_Cpp.default.compilerPath": "E:/app_tool/VSCODE/Mingw-W64/mingw64/bin/gcc.exe",
     "C_Cpp.default.intelliSenseMode": "gcc-arm",

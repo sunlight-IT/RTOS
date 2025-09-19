@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "log/my_log.h"
+#include "tool/memory_detection.h"
 #include "zthread.h"
 
 static event_object_t event_table[EVENT_MAX] = {NULL};
@@ -36,8 +37,10 @@ void event_init(void) {
     // osThreadDef(event_priority, event_task_priority, osPriorityAboveNormal, 0, 128);
     // event_priority_thread.id = osThreadCreate(osThread(event_priority), NULL);
 
-    osMailQDef(event_queue, 10, event_message_t);
+    osMailQDef(event_queue, 5, event_message_t);
     event_queue = osMailCreate(osMailQ(event_queue), event_thread.id);
+
+    check_memory();
 }
 void event_dispatch(event_type type, event_message_t* data) {
     if (type < EVENT_NONE || type >= EVENT_MAX) {

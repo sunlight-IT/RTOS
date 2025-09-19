@@ -13,7 +13,11 @@ typedef struct _zThread_t {
     osMessageQId queue;
     osEvent event_message;
 
+    /* Semaphore */
+    osSemaphoreId semaphore;
+
     /* Event group */
     EventGroupHandle_t event_group;
     thread_callback cb;
+
 } zThread_t;

@@ -3,6 +3,7 @@
 #include "event.h"
 #include "gpio.h"
 #include "log/my_log.h"
+#include "tool/memory_detection.h"
 
 static zThread_t app_message_thread;
 static zThread_t app_event_thread;
@@ -44,7 +45,7 @@ void app_led_init(void) {
     osThreadDef(led_message, app_message_task, osPriorityAboveNormal, 0, 128);
     app_message_thread.id = osThreadCreate(osThread(led_message), NULL);
     if (!app_message_thread.id) {
-        LOGE("app_message_thread.id create error");
+        LOGE("%s create error", (osThread(led_message))->name);
     }
 
     /*msgq init*/
@@ -52,19 +53,19 @@ void app_led_init(void) {
     app_message_thread.queue = osMessageCreate(osMessageQ(led_message), NULL);
     /**event group init*/
     if (!app_message_thread.queue) {
-        LOGE("app_message_thread.queue create error");
+        LOGE("%s queue create error", (osThread(led_message))->name);
     }
 
     app_message_thread.event_group = xEventGroupCreate();
     if (!app_message_thread.event_group) {
-        LOGE("app_message_thread.event_group create error");
+        LOGE("%s eventgrup create error", (osThread(led_message))->name);
     }
 
     osThreadDef(led_event_thread, app_event_task, osPriorityNormal, 0, 128);
     app_event_thread.id = osThreadCreate(osThread(led_event_thread), NULL);
 
     if (!app_event_thread.id) {
-        LOGE("app_event_thread.id create error");
+        LOGE("%s create error", (osThread(led_event_thread))->name);
     }
 
     /*msgq init*/
@@ -81,6 +82,7 @@ void app_led_init(void) {
     }
 
     led_event_init();
+    check_memory();
 }
 void app_led_scheduler_start(void) {
     set_callback(&app_message_thread, led_msg_process);
