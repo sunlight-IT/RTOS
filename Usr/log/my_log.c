@@ -18,7 +18,7 @@
 //   return ch;
 // }
 
-static char s_buff_str[512];
+static char s_buff_str[128];
 static osMutexId s_log_mutex;
 
 void zlog_init(void) {

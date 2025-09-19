@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cmsis_os.h"
-#include "ztask.h"
+#include "zthread.h"
 
 void app_led_init(void);
 void app_led_scheduler_start(void);
