@@ -50,7 +50,8 @@
         "debug_liget.h": "c",
         "component.h": "c",
         "list.h": "c",
-        "work_queue.h": "c"
+        "work_queue.h": "c",
+        "work_timer.h": "c"
     },
     "C_Cpp.default.compilerPath": "E:/app_tool/VSCODE/Mingw-W64/mingw64/bin/gcc.exe",
     "C_Cpp.default.intelliSenseMode": "gcc-arm",
