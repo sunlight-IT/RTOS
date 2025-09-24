@@ -20,6 +20,7 @@ void app_work_queue_add(void (*work_func)(void *), void *arg, TickType_t xValue)
     work_queue_add(&work_queue, xValue, work_func, arg);
 }
 
+void app_remove_timer_note(void) { work_timer_node_remove(&work_timer, 2); }
 void app_work_timer_init(void) { work_timer_init(&work_timer); }
 
 void app_work_timer_scheduler_start(void) { work_timer_start(&work_timer, 1000); }
@@ -40,7 +41,7 @@ void core_init(void) {
     app_work_timer_init();
     memory_monitor_thread_init();
 
-    app_work_timer_add(app_log, (void *)(s_str_work_timer), 1000, 1);
+    app_work_timer_add(app_log, (void *)(s_str_work_timer), 100, 1);
     app_work_timer_add(app_light, NULL, 2000, 2);
 
     // event_init();
@@ -65,9 +66,8 @@ void core_scheduler(void) {
         // DEBUG_LIGHT_TOGGLE;
         app_work_queue_add(app_log, (void *)(s_str_work_queue), 1);
         // app_work_queue_add(app_light, NULL, 2);
-
         osDelay(500);
-    }
+        }
 }
 
 void core_main(void) {

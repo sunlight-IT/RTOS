@@ -50,3 +50,11 @@ void zlog(const char* fmt, ...) {
     osMutexRelease(s_log_mutex);
 #endif
 }
+
+uint32_t zlog_get_tick(void) {
+#if _RTOS
+    return xTaskGetTickCount();
+#else
+    return HAL_GetTick();
+#endif
+}

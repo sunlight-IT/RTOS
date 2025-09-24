@@ -13,16 +13,18 @@ void work_timer_process(TimerHandle_t xTimer) {
     /* 由于定时器的任务不能传递参数，所以使用结构体头地址相同的方法来进行传递*/  //?! 不可行
     work_timer_t *work_timer = (work_timer_t *)pvTimerGetTimerID(xTimer);
     work_timer_node_t *work_node = NULL;
-    uint8_t node_num = 0;
-    TickType_t xitemTicks;
+    TickType_t xitemTicks = 0;
+    UBaseType_t xItemNum = 0;
     xSemaphoreTake(work_timer->lock, portMAX_DELAY);
     if (listLIST_IS_EMPTY(&work_timer->work_time_list)) {
         LOGE("work_timer_process no work node");
         return;
     }
 
-    for (work_node = (work_timer_node_t *)listGET_HEAD_ENTRY(&(work_timer->work_time_list));
-         work_node != NULL; work_node = (work_timer_node_t *)listGET_NEXT(&work_node->list_item)) {
+    for (work_node = (work_timer_node_t *)listGET_HEAD_ENTRY(&(work_timer->work_time_list)),
+        xItemNum = listCURRENT_LIST_LENGTH(&(work_timer->work_time_list));
+         xItemNum > 0;
+         xItemNum--, work_node = (work_timer_node_t *)listGET_NEXT(&work_node->list_item)) {
         if (work_node->xPassTime > 0) {
             work_node->xPassTime--;
         } else if (0 == work_node->xPassTime) {
@@ -30,7 +32,6 @@ void work_timer_process(TimerHandle_t xTimer) {
             work_node->work_func(work_node->arg);
         }
     }
-
     xSemaphoreGive(work_timer->lock);
 }
 
@@ -44,7 +45,7 @@ void work_timer_init(work_timer_t *work_timer) {
     vListInitialise(&work_timer->work_time_list);
 
     work_timer->work_timer =
-        xTimerCreate("work_timer", 1000, pdTRUE, (void *)work_timer, work_timer_process);
+        xTimerCreate("work_timer", 1, pdTRUE, (void *)work_timer, work_timer_process);
     if (work_timer->work_timer == NULL) {
         LOGE("work_timer_init error");
         return;
@@ -62,9 +63,10 @@ void work_timer_init(work_timer_t *work_timer) {
  * @return 无
  * @note 定时器删除函数
  */
+//! 注意: 千万不能让定时器自己删除自己！！！！！  删除定时器后, 定时器将不再执行
 void work_timer_del(work_timer_t *work_timer) {
+    xTimerDelete(work_timer->work_timer, 1000);  // 先删除定时器才可以释放链表
     work_timer_remove_all(work_timer);
-    xTimerDelete(work_timer->work_timer, 1000);
     vSemaphoreDelete(work_timer->lock);
 }
 
@@ -124,17 +126,18 @@ void work_timer_node_add(work_timer_t *work_timer, uint32_t id, TickType_t xItem
  */
 void work_timer_node_remove(work_timer_t *work_timer, uint32_t id) {
     work_timer_node_t *work_node = NULL;
-    uint8_t node_num = 0;
+    UBaseType_t node_num = 0;
     xSemaphoreTake(work_timer->lock, portMAX_DELAY);
-    for (work_node = (work_timer_node_t *)listGET_HEAD_ENTRY(&work_timer->work_time_list);
-         (work_node != NULL && work_node->id != id);
-         work_node = (work_timer_node_t *)listGET_NEXT(&work_node->list_item)) {
+    for (work_node = (work_timer_node_t *)listGET_HEAD_ENTRY(&work_timer->work_time_list),
+        node_num = listCURRENT_LIST_LENGTH(&work_timer->work_time_list);
+         ((work_node->id != id) && node_num > 0);
+         node_num--, work_node = (work_timer_node_t *)listGET_NEXT(&work_node->list_item)) {
     }
-    if (work_node == NULL) {
-        LOGE("no exit this id %d,work_node is null\n", id);
-    } else {
+    if (node_num > 0) {
         uxListRemove(&work_node->list_item);
         vPortFree(work_node);  // 释放工作节点
+    } else {
+        LOGE("no exit this id %d,work_node is null\n", id);
     }
     xSemaphoreGive(work_timer->lock);
 }
@@ -147,10 +150,12 @@ void work_timer_node_remove(work_timer_t *work_timer, uint32_t id) {
  */
 void work_timer_remove_all(work_timer_t *work_timer) {
     work_timer_node_t *work_node = NULL;
-    uint8_t node_num = 0;
+    UBaseType_t node_num = 0;
     xSemaphoreTake(work_timer->lock, portMAX_DELAY);
-    for (work_node = (work_timer_node_t *)listGET_OWNER_OF_HEAD_ENTRY(&work_timer->work_time_list);
-         work_node != NULL; work_node = (work_timer_node_t *)listGET_NEXT(&work_node->list_item)) {
+    for (work_node = (work_timer_node_t *)listGET_HEAD_ENTRY(&work_timer->work_time_list),
+        node_num = listCURRENT_LIST_LENGTH(&work_timer->work_time_list);
+         node_num > 0;
+         (node_num--, work_node = (work_timer_node_t *)listGET_NEXT(&work_node->list_item))) {
         uxListRemove(&work_node->list_item);
         vPortFree(work_node);  // 释放工作节点
     }
