@@ -127,7 +127,9 @@ void work_timer_node_add(work_timer_t *work_timer, uint32_t id, TickType_t xItem
 void work_timer_node_remove(work_timer_t *work_timer, uint32_t id) {
     work_timer_node_t *work_node = NULL;
     UBaseType_t node_num = 0;
-    xSemaphoreTake(work_timer->lock, portMAX_DELAY);
+    xSemaphoreTake(
+        work_timer->lock,
+        portMAX_DELAY);  // 删除工作节点之前先获取锁，确保有锁才能确保该定时节点的函数没被使用
     for (work_node = (work_timer_node_t *)listGET_HEAD_ENTRY(&work_timer->work_time_list),
         node_num = listCURRENT_LIST_LENGTH(&work_timer->work_time_list);
          ((work_node->id != id) && node_num > 0);

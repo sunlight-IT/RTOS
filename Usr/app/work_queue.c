@@ -70,11 +70,11 @@ void work_queue_add(work_queue_t *work_queue, TickType_t xValue, void (*work_fun
     listSET_LIST_ITEM_VALUE(&work_node->list_item, xValue);
 
     xQueueSend(work_queue->work_queue, &work_node,
-               portMAX_DELAY);  // 向工作队列中添加工作,使用0拷贝也就是传递地址的方法进行数据传递
+               portMAX_DELAY);  // 向工作队列中添加工作,使用也就是传递地址的方法进行数据传递
 }
 
 /*
- * @brief 删除一个工作
+ * @brief 取出一个工作
  *
  * @param work_queue* 工作队列指针
  */

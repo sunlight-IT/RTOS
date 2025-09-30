@@ -67,7 +67,8 @@ void core_scheduler(void) {
         app_work_queue_add(app_log, (void *)(s_str_work_queue), 1);
         // app_work_queue_add(app_light, NULL, 2);
         osDelay(500);
-        }
+        app_work_queue_add(app_remove_timer_note, NULL, 3);
+    }
 }
 
 void core_main(void) {
