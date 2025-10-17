@@ -16,8 +16,26 @@ typedef struct _zThread_t {
     /* Semaphore */
     osSemaphoreId semaphore;
 
+    /* Mutex */
+    osMutexId mutex;
+
     /* Event group */
     EventGroupHandle_t event_group;
     thread_callback cb;
 
 } zThread_t;
+
+typedef struct _zThreadOS_t {
+    /* Thread ID */
+    TaskHandle_t handle;
+    /* Event message queue */
+    QueueHandle_t queue;
+    /* Semaphore */
+    SemaphoreHandle_t sem;
+    /* Mutex */
+    SemaphoreHandle_t mutex;
+    /* Event group */
+    EventGroupHandle_t event_group;
+
+    thread_callback cb;
+} zThreadOS_t;

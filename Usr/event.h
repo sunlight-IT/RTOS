@@ -6,7 +6,7 @@
 typedef enum {
     EVENT_NONE = 0,
     EVENT_LED_BLINK,
-    EVENT_MAX,
+    EVENT_MAX = 10,
 } event_type;
 
 typedef enum {

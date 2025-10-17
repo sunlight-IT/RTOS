@@ -1,7 +1,6 @@
 #pragma once
 #include "cmsis_os.h"
 
-
 /*
  * Work Queue
  * 需要的数据和方法有
@@ -28,8 +27,23 @@
  *
  */
 
+typedef enum {
+    k_WORK_NODE_SIGNAL = 0,  // 运行一次
+    k_WORK_NODE_LOOP,        // 循环运行
+} e_work_node_mode_t;
+
+typedef enum {
+    k_WORK_STATUS_IDLE = 0,
+    k_WORK_STATUS_RUNNING,
+    k_WORK_STATUS_PEND,
+    k_WORK_STATUS_DELETED,
+    k_WORK_STATUS_MAX
+} e_work_loop_status_t;
+
 typedef struct _work_node_t {
     ListItem_t list_item;
+    e_work_node_mode_t mode;
+    e_work_loop_status_t status;
     void (*work_func)(void *);
     void *arg;
 } work_node_t;
@@ -37,10 +51,15 @@ typedef struct _work_node_t {
 typedef struct _work_queue_t {
     List_t work_list;
     QueueHandle_t lock;
-    QueueHandle_t work_queue;
+    QueueHandle_t queue;
     TaskHandle_t work_thread;
 } work_queue_t;
 
 void work_queue_init(work_queue_t *work_queue);
+void work_queue_schedule(work_queue_t *work_queue);
 void work_queue_add(work_queue_t *work_queue, TickType_t xValue, void (*work_func)(void *),
-                    void *arg);
+                    e_work_node_mode_t mode, void *arg);
+
+void work_loop_task_del(work_queue_t *work_queue, TickType_t loop_index);
+void work_loop_task_running(work_queue_t *work_queue, TickType_t loop_index);
+void work_loop_task_pending(work_queue_t *work_queue, TickType_t loop_index);

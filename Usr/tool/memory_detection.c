@@ -7,6 +7,7 @@ static zThread_t memory_thread;
 
 void memory_monitor_thread(const void* arg) {
     size_t xFreeHeapSize, minEverFreeHeapSize;
+    LOGI("memory_monitor_thread start");
 
     while (1) {
         osSignalWait(0X01, osWaitForever);

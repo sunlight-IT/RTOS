@@ -16,7 +16,34 @@ static event_type event_priority_table[EVENT_PRIORITY_MAX][10];  // 事件优先级表
 
 static void event_dispatch(event_type type, event_message_t* data);  // 事件调度
 
-void event_register(event_type type, event_cb cb) { event_table[type].callback = cb; }
+void event_register(event_type type, event_cb cb) {
+    if (EVENT_MAX <= type) {
+        LOGE("event_register : %d", type);
+        return;
+    }
+
+    osMutexWait(event_thread.mutex, 0);
+    if (NULL == event_table[type].callback) {
+        event_table[type].callback = cb;
+    } else {
+        LOGE("index: %d is exist", type);
+    }
+    osMutexRelease(event_thread.mutex);
+}
+void event_remove(event_type type) {
+    if (EVENT_MAX <= type) {
+        LOGE("event_register : %d", type);
+        return;
+    }
+
+    osMutexWait(event_thread.mutex, 0);
+    if (NULL != event_table[type].callback) {
+        event_table[type].callback = NULL;
+    } else {
+        LOGE("index: %d is empty", type);
+    }
+    osMutexRelease(event_thread.mutex);
+}
 
 void event_task(const void* arg) {
     while (1) {
@@ -36,6 +63,8 @@ void event_init(void) {
 
     // osThreadDef(event_priority, event_task_priority, osPriorityAboveNormal, 0, 128);
     // event_priority_thread.id = osThreadCreate(osThread(event_priority), NULL);
+    osMutexDef(event_mutex);
+    event_thread.mutex = osMutexCreate(osMutex(event_mutex));
 
     osMailQDef(event_queue, 5, event_message_t);
     event_queue = osMailCreate(osMailQ(event_queue), event_thread.id);

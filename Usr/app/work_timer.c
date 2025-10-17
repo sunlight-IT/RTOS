@@ -2,6 +2,7 @@
 
 #include "log/my_log.h"
 
+#define Tick_Period_MS 100
 /*
  * @description 这是一个在定时器任务上扩展的一个小定时处理 定时器任务处理函数
  * @param xTimer 定时器句柄 使用结构体首地址相同的特点来传递参数
@@ -17,7 +18,7 @@ void work_timer_process(TimerHandle_t xTimer) {
     UBaseType_t xItemNum = 0;
     xSemaphoreTake(work_timer->lock, portMAX_DELAY);
     if (listLIST_IS_EMPTY(&work_timer->work_time_list)) {
-        LOGE("work_timer_process no work node");
+        xSemaphoreGive(work_timer->lock);
         return;
     }
 
@@ -45,7 +46,7 @@ void work_timer_init(work_timer_t *work_timer) {
     vListInitialise(&work_timer->work_time_list);
 
     work_timer->work_timer =
-        xTimerCreate("work_timer", 1, pdTRUE, (void *)work_timer, work_timer_process);
+        xTimerCreate("work_timer", Tick_Period_MS, pdTRUE, (void *)work_timer, work_timer_process);
     if (work_timer->work_timer == NULL) {
         LOGE("work_timer_init error");
         return;
