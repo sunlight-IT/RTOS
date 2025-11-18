@@ -5,25 +5,29 @@
 
 static zThread_t memory_thread;
 
-void memory_monitor_thread(const void* arg) {
+void memory_monitor_thread(void) {
     size_t xFreeHeapSize, minEverFreeHeapSize;
     LOGI("memory_monitor_thread start");
 
-    while (1) {
-        osSignalWait(0X01, osWaitForever);
-        xFreeHeapSize = xPortGetFreeHeapSize();
-        minEverFreeHeapSize = xPortGetMinimumEverFreeHeapSize();
-        LOGI("free heap size: %d", xFreeHeapSize);
-        LOGI("min ever free heap size: %d", minEverFreeHeapSize);
-        osDelay(5);
-    }
+    osSignalWait(0X01, osWaitForever);
+    xFreeHeapSize = xPortGetFreeHeapSize();
+    minEverFreeHeapSize = xPortGetMinimumEverFreeHeapSize();
+    LOGI("free heap size: %d", xFreeHeapSize);
+    LOGI("min ever free heap size: %d", minEverFreeHeapSize);
+    osDelay(5);
 }
 
+static zThreadOS_t memory_thread_os;
 void memory_monitor_thread_init(void) {
-    osThreadDef(memory_monitor, memory_monitor_thread, osPriorityAboveNormal, 0, 128);
-    memory_thread.id = osThreadCreate(osThread(memory_monitor), NULL);
-    if (!memory_thread.id) {
-        LOGE("%s create error", (osThread(memory_monitor))->name);
+    // osThreadDef(memory_monitor, memory_monitor_thread, osPriorityAboveNormal, 0, 128);
+    // memory_thread.id = osThreadCreate(osThread(memory_monitor), NULL);
+    // if (!memory_thread.id) {
+    //     LOGE("%s create error", (osThread(memory_monitor))->name);
+    // }
+
+    if (1 != zThread_create(&memory_thread_os, "Memory_monitor", memory_monitor_thread,
+                            osPriorityNormal)) {
+        LOGE("memory_monitor zThread_create error");
     }
 }
 

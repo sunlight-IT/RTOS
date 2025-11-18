@@ -19,7 +19,7 @@ static void led_event_process(void);
 void app_message_task(const void* arg) {
     while (1) {
         // 预留一个任务状态位的处理
-        if (app_message_thread.cb) app_message_thread.cb();
+        if (app_message_thread.cb) app_message_thread.cb(NULL);
 
         osDelay(10);
     }
@@ -29,7 +29,7 @@ void app_event_task(const void* arg) {
     while (1) {
         // 预留一个任务状态位的处理
 
-        if (app_event_thread.cb) app_event_thread.cb();
+        if (app_event_thread.cb) app_event_thread.cb(NULL);
 
         osDelay(10);
     }
