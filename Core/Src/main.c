@@ -22,12 +22,13 @@
 #include "cmsis_os.h"
 #include "dma.h"
 #include "gpio.h"
+#include "tim.h"
 #include "usart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
 #include "core.h"
+#include "osal.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,15 +94,18 @@ int main(void) {
     MX_DMA_Init();
     MX_USART1_UART_Init();
     MX_USART2_Init();
+    MX_TIM2_Init();
+    MX_TIM3_Init();
     /* USER CODE BEGIN 2 */
-
+    osal_init(OSAL_OS_FREERTOS);
+    osal_start();
     /* USER CODE END 2 */
 
     /* Call init function for freertos objects (in cmsis_os2.c) */
-    MX_FREERTOS_Init();
+    // MX_FREERTOS_Init();
 
     /* Start scheduler */
-    osKernelStart();
+    // osKernelStart();
 
     /* We should never get here as control is now taken by the scheduler */
 
@@ -163,7 +167,7 @@ void SystemClock_Config(void) {
  * @param  htim : TIM handle
  * @retval None
  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
     /* USER CODE BEGIN Callback 0 */
 
     /* USER CODE END Callback 0 */
@@ -195,7 +199,7 @@ void Error_Handler(void) {
  * @param  line: assert_param error line source number
  * @retval None
  */
-void assert_failed(uint8_t *file, uint32_t line) {
+void assert_failed(uint8_t* file, uint32_t line) {
     /* USER CODE BEGIN 6 */
     /* User can add his own implementation to report the file name and line number,
        ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */

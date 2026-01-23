@@ -46,6 +46,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+#define HEAP_ADDRESS 0x20002000
+uint8_t ucHeap[configTOTAL_HEAP_SIZE] __attribute__((at(HEAP_ADDRESS)));
 
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
@@ -55,7 +57,7 @@ osThreadId defaultTaskHandle;
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void const *argument);
+__weak void StartDefaultTask(void const *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -63,6 +65,11 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer,
                                    StackType_t **ppxIdleTaskStackBuffer,
                                    uint32_t *pulIdleTaskStackSize);
+
+/* GetTimerTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
+                                    StackType_t **ppxTimerTaskStackBuffer,
+                                    uint32_t *pulTimerTaskStackSize);
 
 /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
 static StaticTask_t xIdleTaskTCBBuffer;
@@ -76,7 +83,22 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer,
     *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
     /* place for user code */
 }
+
+StaticTask_t xTimerTaskTCBBuffer;
+StackType_t xTimerTaskStack[configTIMER_TASK_STACK_DEPTH];
+
+void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
+                                    StackType_t **ppxTimerTaskStackBuffer,
+                                    uint32_t *pulTimerTaskStackSize) {
+    *ppxTimerTaskTCBBuffer = &xTimerTaskTCBBuffer;
+    *ppxTimerTaskStackBuffer = &xTimerTaskStack[0];
+    *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
+}
 /* USER CODE END GET_IDLE_TASK_MEMORY */
+
+/* USER CODE BEGIN GET_TIMER_TASK_MEMORY */
+
+/* USER CODE END GET_TIMER_TASK_MEMORY */
 
 /**
  * @brief  FreeRTOS initialization
@@ -125,8 +147,6 @@ __weak void StartDefaultTask(void const *argument) {
     /* USER CODE BEGIN StartDefaultTask */
     /* Infinite loop */
     for (;;) {
-        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-        osDelay(500);
     }
     /* USER CODE END StartDefaultTask */
 }
