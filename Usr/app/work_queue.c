@@ -114,6 +114,7 @@ void work_queue_init(work_queue_t *work_queue) {
     // vQueueAddToRegistry(work_queue->sem, "work_queue_sem");
     work_queue->queue = xQueueCreate(10, sizeof(work_node_t *));
     // vQueueAddToRegistry(work_queue->work_queue, "work_queue");
+    
     xTaskCreate(work_queue_thread, "work_queue_thread", 256, work_queue, 5,
                 &(work_queue->work_thread));
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "cmsis_os.h"
+#include "osal_task.h"
 #include "zthread.h"
 
 /*

@@ -58,6 +58,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_PREEMPTION 1
 #define configSUPPORT_STATIC_ALLOCATION 1
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
+
 #define configUSE_IDLE_HOOK 0
 #define configUSE_TICK_HOOK 0
 #define configCPU_CLOCK_HZ (SystemCoreClock)
@@ -76,6 +77,15 @@ extern uint32_t SystemCoreClock;
 #define configMESSAGE_BUFFER_LENGTH_TYPE size_t
 /* USER CODE END MESSAGE_BUFFER_LENGTH_TYPE */
 
+/*  osal层想要开起的宏  */
+#define configUSE_TRACE_FACILITY 1
+#define configUSE_RECURSIVE_MUTEXES 1
+#define INCLUDE_uxTaskGetStackHighWaterMark 1
+#define INCLUDE_vTaskDelayUntil 1
+#define INCLUDE_xTimerPendFunctionCall 1
+#define configUSE_COUNTING_SEMAPHORES 1
+#define INCLUDE_xSemaphoreGetMutexHolder 1
+
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 1
 #define configMAX_CO_ROUTINE_PRIORITIES (2)
@@ -93,7 +103,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelete 1
 #define INCLUDE_vTaskCleanUpResources 0
 #define INCLUDE_vTaskSuspend 1
-#define INCLUDE_vTaskDelayUntil 0
+// #define INCLUDE_vTaskDelayUntil 0
 #define INCLUDE_vTaskDelay 1
 #define INCLUDE_xTaskGetSchedulerState 1
 

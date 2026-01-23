@@ -60,7 +60,7 @@ void event_task(void* arg) {
 
     if (err == pdTRUE) {
     }
-    osDelay(10);
+    osDelay(100);
 }
 
 void event_init(void) {
