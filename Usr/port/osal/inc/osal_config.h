@@ -58,9 +58,19 @@ typedef enum {
 #define OSAL_CFG_EVENT_ENABLE 1
 #endif
 
+/** @brief 是否启用任务通知模块 */
+#ifndef OSAL_CFG_TASK_NOTIFY_ENABLE
+#define OSAL_CFG_TASK_NOTIFY_ENABLE 1
+#endif
+
 /** @brief 是否启用内存管理模块 */
 #ifndef OSAL_CFG_MEMORY_ENABLE
 #define OSAL_CFG_MEMORY_ENABLE 1
+#endif
+
+/** @brief 是否启用链表模块 */
+#ifndef OSAL_CFG_LIST_ENABLE
+#define OSAL_CFG_LIST_ENABLE 1
 #endif
 
 /* ==================== 参数配置 ==================== */

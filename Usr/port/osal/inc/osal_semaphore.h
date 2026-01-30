@@ -80,24 +80,6 @@ osal_status_t osal_semaphore_acquire(osal_semaphore_t handle, osal_tick_t timeou
 osal_status_t osal_semaphore_release(osal_semaphore_t handle);
 
 /**
- * @brief 释放信号量（ISR安全版本）
- * @param handle 信号量句柄
- * @param[out] higher_pri_task_woken 是否唤醒了高优先级任务
- * @return OSAL_OK 成功
- *         OSAL_ERROR_INVALID_PARAM 参数错误
- */
-osal_status_t osal_semaphore_release_from_isr(osal_semaphore_t handle, int* higher_pri_task_woken);
-
-/**
- * @brief 尝试获取信号量（非阻塞）
- * @param handle 信号量句柄
- * @return OSAL_OK 成功
- *         OSAL_ERROR_BUSY 信号量不可用
- *         OSAL_ERROR_INVALID_PARAM 参数错误
- */
-osal_status_t osal_semaphore_try_acquire(osal_semaphore_t handle);
-
-/**
  * @brief 获取信号量当前计数值
  * @param handle 信号量句柄
  * @param[out] count 计数值输出指针

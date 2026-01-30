@@ -52,6 +52,21 @@ typedef void* osal_event_t;
 typedef void* osal_memory_t;
 
 /**
+ * @brief 任务通知句柄
+ */
+typedef void* osal_task_notify_t;
+
+/**
+ * @brief 链表句柄
+ */
+typedef void* osal_list_t;
+
+/**
+ * @brief 链表节点句柄
+ */
+typedef void osal_list_node_t;
+
+/**
  * @brief 任务函数指针类型
  * @param param 任务参数
  */

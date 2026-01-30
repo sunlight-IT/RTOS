@@ -93,20 +93,7 @@ osal_status_t osal_mutex_release(osal_mutex_t handle) {
     return ops->release(handle);
 }
 
-osal_status_t osal_mutex_try_acquire(osal_mutex_t handle) {
-    const osal_mutex_ops_t* ops = osal_get_mutex_ops();
 
-#if OSAL_CFG_PARAM_CHECK
-    if (ops == NULL || ops->try_acquire == NULL) {
-        return OSAL_ERROR_NOT_INIT;
-    }
-    if (handle == NULL) {
-        return OSAL_ERROR_INVALID_PARAM;
-    }
-#endif
-
-    return ops->try_acquire(handle);
-}
 
 osal_status_t osal_mutex_get_owner(osal_mutex_t handle, osal_task_t* owner) {
     const osal_mutex_ops_t* ops = osal_get_mutex_ops();
@@ -233,36 +220,6 @@ osal_status_t osal_semaphore_release(osal_semaphore_t handle) {
 #endif
 
     return ops->release(handle);
-}
-
-osal_status_t osal_semaphore_release_from_isr(osal_semaphore_t handle, int* higher_pri_task_woken) {
-    const osal_semaphore_ops_t* ops = osal_get_semaphore_ops();
-
-#if OSAL_CFG_PARAM_CHECK
-    if (ops == NULL || ops->release_from_isr == NULL) {
-        return OSAL_ERROR_NOT_INIT;
-    }
-    if (handle == NULL) {
-        return OSAL_ERROR_INVALID_PARAM;
-    }
-#endif
-
-    return ops->release_from_isr(handle, higher_pri_task_woken);
-}
-
-osal_status_t osal_semaphore_try_acquire(osal_semaphore_t handle) {
-    const osal_semaphore_ops_t* ops = osal_get_semaphore_ops();
-
-#if OSAL_CFG_PARAM_CHECK
-    if (ops == NULL || ops->try_acquire == NULL) {
-        return OSAL_ERROR_NOT_INIT;
-    }
-    if (handle == NULL) {
-        return OSAL_ERROR_INVALID_PARAM;
-    }
-#endif
-
-    return ops->try_acquire(handle);
 }
 
 osal_status_t osal_semaphore_get_count(osal_semaphore_t handle, uint32_t* count) {
@@ -398,21 +355,7 @@ osal_status_t osal_event_set(osal_event_t handle, osal_event_flags_t flags) {
     return ops->set(handle, flags);
 }
 
-osal_status_t osal_event_set_from_isr(osal_event_t handle, osal_event_flags_t flags,
-                                      int* higher_pri_task_woken) {
-    const osal_event_ops_t* ops = osal_get_event_ops();
 
-#if OSAL_CFG_PARAM_CHECK
-    if (ops == NULL || ops->set_from_isr == NULL) {
-        return OSAL_ERROR_NOT_INIT;
-    }
-    if (handle == NULL) {
-        return OSAL_ERROR_INVALID_PARAM;
-    }
-#endif
-
-    return ops->set_from_isr(handle, flags, higher_pri_task_woken);
-}
 
 osal_status_t osal_event_clear(osal_event_t handle, osal_event_flags_t flags) {
     const osal_event_ops_t* ops = osal_get_event_ops();

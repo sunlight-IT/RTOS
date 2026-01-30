@@ -70,17 +70,6 @@ osal_status_t osal_event_wait(osal_event_t handle, osal_event_flags_t wait_flags
 osal_status_t osal_event_set(osal_event_t handle, osal_event_flags_t flags);
 
 /**
- * @brief 设置事件标志（ISR安全版本）
- * @param handle 事件句柄
- * @param flags 要设置的事件标志位
- * @param[out] higher_pri_task_woken 是否唤醒了高优先级任务
- * @return OSAL_OK 成功
- *         OSAL_ERROR_INVALID_PARAM 参数错误
- */
-osal_status_t osal_event_set_from_isr(osal_event_t handle, osal_event_flags_t flags,
-                                      int* higher_pri_task_woken);
-
-/**
  * @brief 清除事件标志
  * @param handle 事件句柄
  * @param flags 要清除的事件标志位

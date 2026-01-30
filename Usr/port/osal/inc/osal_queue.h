@@ -82,28 +82,6 @@ osal_status_t osal_queue_send_front(osal_queue_t handle, const void* data, osal_
 osal_status_t osal_queue_receive(osal_queue_t handle, void* data, osal_tick_t timeout);
 
 /**
- * @brief 从队列接收数据（ISR安全版本）
- * @param handle 队列句柄
- * @param[out] data 数据缓冲区指针
- * @param[out] higher_pri_task_woken 是否唤醒了高优先级任务
- * @return OSAL_OK 成功
- *         OSAL_ERROR_INVALID_PARAM 参数错误
- */
-osal_status_t osal_queue_receive_from_isr(osal_queue_t handle, void* data,
-                                          int* higher_pri_task_woken);
-
-/**
- * @brief 向队列发送数据（ISR安全版本）
- * @param handle 队列句柄
- * @param data 数据指针
- * @param[out] higher_pri_task_woken 是否唤醒了高优先级任务
- * @return OSAL_OK 成功
- *         OSAL_ERROR_INVALID_PARAM 参数错误
- */
-osal_status_t osal_queue_send_from_isr(osal_queue_t handle, const void* data,
-                                       int* higher_pri_task_woken);
-
-/**
  * @brief 清空队列
  * @param handle 队列句柄
  * @return OSAL_OK 成功

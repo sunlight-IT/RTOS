@@ -110,38 +110,6 @@ osal_status_t osal_queue_receive(osal_queue_t handle, void* data, osal_tick_t ti
     return ops->receive(handle, data, timeout);
 }
 
-osal_status_t osal_queue_receive_from_isr(osal_queue_t handle, void* data,
-                                          int* higher_pri_task_woken) {
-    const osal_queue_ops_t* ops = osal_get_queue_ops();
-
-#if OSAL_CFG_PARAM_CHECK
-    if (ops == NULL || ops->receive_from_isr == NULL) {
-        return OSAL_ERROR_NOT_INIT;
-    }
-    if (handle == NULL || data == NULL) {
-        return OSAL_ERROR_INVALID_PARAM;
-    }
-#endif
-
-    return ops->receive_from_isr(handle, data, higher_pri_task_woken);
-}
-
-osal_status_t osal_queue_send_from_isr(osal_queue_t handle, const void* data,
-                                       int* higher_pri_task_woken) {
-    const osal_queue_ops_t* ops = osal_get_queue_ops();
-
-#if OSAL_CFG_PARAM_CHECK
-    if (ops == NULL || ops->send_from_isr == NULL) {
-        return OSAL_ERROR_NOT_INIT;
-    }
-    if (handle == NULL || data == NULL) {
-        return OSAL_ERROR_INVALID_PARAM;
-    }
-#endif
-
-    return ops->send_from_isr(handle, data, higher_pri_task_woken);
-}
-
 osal_status_t osal_queue_reset(osal_queue_t handle) {
     const osal_queue_ops_t* ops = osal_get_queue_ops();
 

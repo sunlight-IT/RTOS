@@ -12,11 +12,13 @@
 
 /* 引入所有组件头文件 */
 #include "osal_event.h"
+#include "osal_list.h"
 #include "osal_memory.h"
 #include "osal_mutex.h"
 #include "osal_queue.h"
 #include "osal_semaphore.h"
 #include "osal_task.h"
+#include "osal_task_notify.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -131,15 +133,16 @@ void osal_critical_exit(uint32_t state);
  * @brief OSAL系统信息结构体
  */
 typedef struct {
-    const char* version;      /**< 版本号 */
-    osal_os_type_t os_type;   /**< OS类型 */
-    osal_state_t state;       /**< OSAL状态 */
-    uint32_t tick_rate_hz;    /**< 系统时钟频率 */
-    uint32_t task_count;      /**< 当前任务数量 */
-    uint32_t queue_count;     /**< 当前队列数量 */
-    uint32_t mutex_count;     /**< 当前互斥锁数量 */
-    uint32_t semaphore_count; /**< 当前信号量数量 */
-    uint32_t event_count;     /**< 当前事件数量 */
+    const char* version;        /**< 版本号 */
+    osal_os_type_t os_type;     /**< OS类型 */
+    osal_state_t state;         /**< OSAL状态 */
+    uint32_t tick_rate_hz;      /**< 系统时钟频率 */
+    uint32_t task_count;        /**< 当前任务数量 */
+    uint32_t queue_count;       /**< 当前队列数量 */
+    uint32_t mutex_count;       /**< 当前互斥锁数量 */
+    uint32_t semaphore_count;   /**< 当前信号量数量 */
+    uint32_t event_count;       /**< 当前事件数量 */
+    uint32_t task_notify_count; /**< 当前任务通知数量 */
 } osal_info_t;
 
 /**
