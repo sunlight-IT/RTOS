@@ -18,11 +18,11 @@
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_MAIN__)
 /* ARM Cortex-M内核支持__get_IPSR() */
 #include "cmsis_gcc.h"
- int inHandlerMode(void) { return __get_IPSR() != 0; }
+int inHandlerMode(void) { return __get_IPSR() != 0; }
 #else
 /* 其他平台使用FreeRTOS提供的方式 */
 
- int inHandlerMode(void) {
+int inHandlerMode(void) {
 /* xPortIsInsideInterrupt是FreeRTOS内部函数，可能不可用 */
 /* 使用替代方案：检查EXC_RETURN或使用port宏 */
 #if configASSERT_DEFINED
@@ -34,6 +34,17 @@
 #endif
 }
 #endif
+
+/* Convert from CMSIS type osPriority to FreeRTOS priority number */
+unsigned long osal_makeFreeRtosPriority(osal_priority_t priority) {
+    unsigned long fpriority = OSAL_IDLE_PRIORITY;
+
+    if (priority != osalPriorityError) {
+        fpriority += (priority - osalPriorityIdle);
+    }
+
+    return fpriority;
+}
 
 /* ==================== 初始化和反初始化 ==================== */
 

@@ -64,7 +64,7 @@ typedef void* osal_list_t;
 /**
  * @brief 链表节点句柄
  */
-typedef void osal_list_node_t;
+typedef void* osal_list_node_t;
 
 /**
  * @brief 任务函数指针类型
@@ -75,7 +75,7 @@ typedef void (*osal_task_func_t)(void* param);
 /**
  * @brief 任务优先级类型
  */
-typedef uint8_t osal_priority_t;
+// typedef uint8_t osal_priority_t;
 
 /**
  * @brief 时间类型（毫秒）
@@ -104,13 +104,18 @@ typedef enum {
 
 /* ==================== 任务优先级宏定义 ==================== */
 
-#define OSAL_PRIORITY_IDLE 0          /**< 空闲任务优先级 */
-#define OSAL_PRIORITY_LOW 5           /**< 低优先级 */
-#define OSAL_PRIORITY_NORMAL 10       /**< 普通优先级 */
-#define OSAL_PRIORITY_ABOVE_NORMAL 15 /**< 高于普通优先级 */
-#define OSAL_PRIORITY_HIGH 20         /**< 高优先级 */
-#define OSAL_PRIORITY_REALTIME 25     /**< 实时优先级 */
-#define OSAL_PRIORITY_MAX 31          /**< 最大优先级 */
+/// Priority used for thread control.
+/// \note MUST REMAIN UNCHANGED: \b osPriority shall be consistent in every CMSIS-RTOS.
+typedef enum {
+    osalPriorityIdle = -3,         ///< priority: idle (lowest)
+    osalPriorityLow = -2,          ///< priority: low
+    osalPriorityBelowNormal = -1,  ///< priority: below normal
+    osalPriorityNormal = 0,        ///< priority: normal (default)
+    osalPriorityAboveNormal = +1,  ///< priority: above normal
+    osalPriorityHigh = +2,         ///< priority: high
+    osalPriorityRealtime = +3,     ///< priority: realtime (highest)
+    osalPriorityError = 0x84  ///< system cannot determine priority or thread has illegal priority
+} osal_priority_t;
 
 /* ==================== 时间宏定义 ==================== */
 

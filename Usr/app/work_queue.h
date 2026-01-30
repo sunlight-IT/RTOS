@@ -1,6 +1,6 @@
 #pragma once
 #include "cmsis_os.h"
-#include "osal_task.h"
+#include "osal.h"
 #include "zthread.h"
 
 /*
@@ -43,12 +43,11 @@ typedef enum {
 } e_work_loop_status_t;
 
 typedef struct _work_node_t {
-    ListItem_t list_item;
     e_work_node_mode_t mode;
     e_work_loop_status_t status;
     void (*work_func)(void*);
     void* arg;
-} work_node_t;
+} work_node_data_t;
 
 typedef struct _work_queue_t {
     List_t work_list;

@@ -37,8 +37,8 @@ typedef struct {
  * @return OSAL_OK 成功
  *         OSAL_ERROR_INVALID_PARAM 参数错误
  */
-osal_status_t osal_task_notify(osal_task_t task, uint32_t value, uint8_t action,
-                               uint32_t* prev_value);
+osal_status_t osal_task_notify_set(osal_task_t task, uint32_t value, uint8_t action,
+                                   uint32_t* prev_value);
 
 /**
  * @brief 等待任务通知
@@ -67,13 +67,22 @@ osal_status_t osal_task_notify_clear(osal_task_t task, uint32_t bits_to_clear,
 
 /**
  * @brief 任务通知动作枚举
- */
-#define OSAL_TASK_NOTIFY_NO_ACTION 0x00                   /**< 不执行任何动作（仅设置值） */
-#define OSAL_TASK_NOTIFY_SET_BITS 0x01                    /**< 设置位 */
-#define OSAL_TASK_NOTIFY_INCREMENT 0x02                   /**< 递增计数 */
-#define OSAL_TASK_NOTIFY_SET_VALUE_WITHOUT_OVERWRITE 0x03 /**< 设置值（不覆盖） */
-#define OSAL_TASK_NOTIFY_SET_VALUE 0x04                   /**< 设置值（覆盖） */
+//  */
+// #define OSAL_TASK_NOTIFY_NO_ACTION 0x00                   /**< 不执行任何动作（仅设置值） */
+// #define OSAL_TASK_NOTIFY_SET_BITS 0x01                    /**< 设置位 */
+// #define OSAL_TASK_NOTIFY_INCREMENT 0x02                   /**< 递增计数 */
+// #define OSAL_TASK_NOTIFY_SET_VALUE_WITHOUT_OVERWRITE 0x03 /**< 设置值（不覆盖） */
+// #define OSAL_TASK_NOTIFY_SET_VALUE 0x04                   /**< 设置值（覆盖） */
 
+typedef enum {
+    osal_NoAction = 0,          /* Notify the task without updating its notify value. */
+    osal_SetBits,               /* Set bits in the task's notification value. */
+    osal_Increment,             /* Increment the task's notification value. */
+    osal_SetValueWithOverwrite, /* Set the task's notification value to a specific value even if the
+                               previous value has not yet been read by the task. */
+    osal_SetValueWithoutOverwrite /* Set the task's notification value if the previous value has
+                                 been read by the task. */
+} osal_notify_action_t;
 /* ==================== 任务通知状态宏定义 ==================== */
 
 /**

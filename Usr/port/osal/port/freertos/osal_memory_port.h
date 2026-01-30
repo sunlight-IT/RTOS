@@ -38,12 +38,12 @@ void* osal_port_freertos_memory_calloc(uint32_t num, uint32_t size);
 /**
  * @brief 获取空闲内存大小
  */
-uint32_t osal_port_freertos_memory_get_free_size(void);
+size_t osal_port_freertos_memory_get_free_size(void);
 
 /**
  * @brief 获取历史最小空闲内存大小
  */
-uint32_t osal_port_freertos_memory_get_minimum_free_size(void);
+size_t osal_port_freertos_memory_get_minimum_free_size(void);
 
 #ifdef __cplusplus
 }

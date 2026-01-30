@@ -400,6 +400,8 @@ const osal_port_desc_t* osal_get_current_port(void) {
 
 /* ==================== OSAL初始化和控制接口 ==================== */
 
+
+
 osal_status_t osal_init(osal_os_type_t os_type) {
     osal_instance_t* instance = osal_get_instance();
 

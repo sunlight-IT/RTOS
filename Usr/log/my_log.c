@@ -4,6 +4,7 @@
 
 #include "cmsis_os.h"
 #include "core.h"
+#include "osal.h"
 #include "usart.h"
 
 // #ifdef __GNUC__
@@ -19,11 +20,18 @@
 // }
 
 static char s_buff_str[128];
-static osMutexId s_log_mutex;
+static osal_mutex_t s_log_mutex;
+int32_t s_log_initialized = 0;
 
 void zlog_init(void) {
     osMutexDef(LOG_MUTEX);
     s_log_mutex = osMutexCreate(osMutex(LOG_MUTEX));
+    osal_mutex_config_t config = {.name = "log_mutex", .inherit = 1};
+    if (OSAL_OK != osal_mutex_create(&config, &s_log_mutex)) {
+        s_log_initialized = 0;
+    } else {
+        s_log_initialized = 1;
+    }
 }
 
 void zlog(const char* fmt, ...) {
@@ -31,9 +39,12 @@ void zlog(const char* fmt, ...) {
     // char buff_str[512];
     // char buff_str[256]; 会导致溢出，而且无法打印，64就可以正常打印
     /* rtos要用信号量锁住*/
+    if (!s_log_initialized) {
+        return;
+    }
 
 #if _RTOS
-    osMutexWait(s_log_mutex, osWaitForever);
+    osal_mutex_acquire(s_log_mutex, osWaitForever);
 #endif
 
     va_list args;
@@ -47,7 +58,7 @@ void zlog(const char* fmt, ...) {
     }
 
 #if _RTOS
-    osMutexRelease(s_log_mutex);
+    osal_mutex_release(s_log_mutex);
 #endif
 }
 

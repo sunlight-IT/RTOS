@@ -85,7 +85,7 @@ typedef enum  {
   osPriorityAboveNormal   = +1,          ///< priority: above normal
   osPriorityHigh          = +2,          ///< priority: high
   osPriorityRealtime      = +3,          ///< priority: realtime (highest)
-  osPriorityError         =  0x84        ///< system cannot determine priority or thread has illegal priority
+  osalPriorityError         =  0x84        ///< system cannot determine priority or thread has illegal priority
 } osPriority;
  
 /// Timeout value.

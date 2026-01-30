@@ -1,16 +1,17 @@
 /**
  * @file example_basic.c
- * @brief OSALåŸºæœ¬ä½¿ç”¨ç¤ºä¾‹
- * @details æ¼”ç¤ºå¦‚ä½•ä½¿ç”¨OSALè¿›è¡Œä»»åŠ¡ã€é˜Ÿåˆ—ã€äº’æ–¥é”ç­‰åŸºæœ¬æ“ä½œ
+ * @brief OSAL»ù±¾Ê¹ÓÃÊ¾Àı
+ * @details ÑİÊ¾ÈçºÎÊ¹ÓÃOSAL½øĞĞÈÎÎñ¡¢¶ÓÁĞ¡¢»¥³âËøµÈ»ù±¾²Ù×÷
  */
 
-#include "osal.h"
 #include <stdio.h>
 
-/* ==================== ä»»åŠ¡é…ç½® ==================== */
+#include "osal.h"
+
+/* ==================== ÈÎÎñÅäÖÃ ==================== */
 
 /**
- * @brief ç”Ÿäº§è€…ä»»åŠ¡å‚æ•°
+ * @brief Éú²úÕßÈÎÎñ²ÎÊı
  */
 typedef struct {
     osal_queue_t queue;
@@ -18,48 +19,48 @@ typedef struct {
 } producer_task_param_t;
 
 /**
- * @brief æ¶ˆè´¹è€…ä»»åŠ¡å‚æ•°
+ * @brief Ïû·ÑÕßÈÎÎñ²ÎÊı
  */
 typedef struct {
     osal_queue_t queue;
 } consumer_task_param_t;
 
-/* ==================== ä»»åŠ¡å‡½æ•° ==================== */
+/* ==================== ÈÎÎñº¯Êı ==================== */
 
 /**
- * @brief ç”Ÿäº§è€…ä»»åŠ¡å‡½æ•°
+ * @brief Éú²úÕßÈÎÎñº¯Êı
  */
-static void producer_task(void *param)
-{
-    producer_task_param_t *task_param = (producer_task_param_t *)param;
+static void producer_task(void* param) {
+    producer_task_param_t* task_param = (producer_task_param_t*)param;
 
     while (1) {
-        /* ç”Ÿäº§æ•°æ® */
+        /* Éú²úÊı¾İ */
         task_param->value++;
         printf("Producer: Sending value %d\n", task_param->value);
 
-        /* å‘é€åˆ°é˜Ÿåˆ— */
-        osal_status_t ret = osal_queue_send(task_param->queue, &task_param->value, OSAL_WAIT_FOREVER);
+        /* ·¢ËÍµ½¶ÓÁĞ */
+        osal_status_t ret =
+            osal_queue_send(task_param->queue, &task_param->value, OSAL_WAIT_FOREVER);
         if (ret != OSAL_OK) {
             printf("Producer: Send failed, error: %s\n", osal_strerror(ret));
         }
 
-        /* å»¶æ—¶1ç§’ */
+        /* ÑÓÊ±1Ãë */
         osal_task_delay(1000);
     }
 }
 
 /**
- * @brief æ¶ˆè´¹è€…ä»»åŠ¡å‡½æ•°
+ * @brief Ïû·ÑÕßÈÎÎñº¯Êı
  */
-static void consumer_task(void *param)
-{
-    consumer_task_param_t *task_param = (consumer_task_param_t *)param;
+static void consumer_task(void* param) {
+    consumer_task_param_t* task_param = (consumer_task_param_t*)param;
     int received_value;
 
     while (1) {
-        /* ä»é˜Ÿåˆ—æ¥æ”¶ */
-        osal_status_t ret = osal_queue_receive(task_param->queue, &received_value, OSAL_WAIT_FOREVER);
+        /* ´Ó¶ÓÁĞ½ÓÊÕ */
+        osal_status_t ret =
+            osal_queue_receive(task_param->queue, &received_value, OSAL_WAIT_FOREVER);
         if (ret == OSAL_OK) {
             printf("Consumer: Received value %d\n", received_value);
         } else {
@@ -69,14 +70,13 @@ static void consumer_task(void *param)
 }
 
 /**
- * @brief ç»Ÿè®¡ä»»åŠ¡å‡½æ•°
+ * @brief Í³¼ÆÈÎÎñº¯Êı
  */
-static void stats_task(void *param)
-{
+static void stats_task(void* param) {
     (void)param;
 
     while (1) {
-        /* æ¯5ç§’æ‰“å°ä¸€æ¬¡ç»Ÿè®¡ä¿¡æ¯ */
+        /* Ã¿5Ãë´òÓ¡Ò»´ÎÍ³¼ÆĞÅÏ¢ */
         osal_task_delay(5000);
 
         osal_info_t info;
@@ -95,18 +95,17 @@ static void stats_task(void *param)
     }
 }
 
-/* ==================== ä¸»å‡½æ•° ==================== */
+/* ==================== Ö÷º¯Êı ==================== */
 
 /**
- * @brief ä¸»å‡½æ•°
+ * @brief Ö÷º¯Êı
  */
-int main(void)
-{
+int main(void) {
     osal_status_t ret;
     osal_task_t producer_handle, consumer_handle, stats_handle;
     osal_queue_t queue;
 
-    /* åˆå§‹åŒ–OSAL */
+    /* ³õÊ¼»¯OSAL */
     ret = osal_init(OSAL_OS_FREERTOS);
     if (ret != OSAL_OK) {
         printf("OSAL init failed: %s\n", osal_strerror(ret));
@@ -116,12 +115,9 @@ int main(void)
     printf("OSAL initialized successfully\n");
     printf("OSAL Version: %s\n", osal_get_version());
 
-    /* åˆ›å»ºé˜Ÿåˆ— */
+    /* ´´½¨¶ÓÁĞ */
     osal_queue_config_t queue_config = {
-        .name = "DataQueue",
-        .max_items = 10,
-        .item_size = sizeof(int)
-    };
+        .name = "DataQueue", .max_items = 10, .item_size = sizeof(int)};
 
     ret = osal_queue_create(&queue_config, &queue);
     if (ret != OSAL_OK) {
@@ -132,7 +128,7 @@ int main(void)
 
     printf("Queue created successfully\n");
 
-    /* åˆ›å»ºä»»åŠ¡å‚æ•° */
+    /* ´´½¨ÈÎÎñ²ÎÊı */
     static producer_task_param_t producer_param;
     static consumer_task_param_t consumer_param;
 
@@ -140,15 +136,13 @@ int main(void)
     producer_param.value = 0;
     consumer_param.queue = queue;
 
-    /* åˆ›å»ºç”Ÿäº§è€…ä»»åŠ¡ */
-    osal_task_config_t producer_config = {
-        .name = "Producer",
-        .func = producer_task,
-        .param = &producer_param,
-        .stack_size = 512,
-        .priority = OSAL_PRIORITY_NORMAL,
-        .time_slice = 0
-    };
+    /* ´´½¨Éú²úÕßÈÎÎñ */
+    osal_task_config_t producer_config = {.name = "Producer",
+                                          .func = producer_task,
+                                          .param = &producer_param,
+                                          .stack_size = 512,
+                                          .priority = OSAL_PRIORITY_NORMAL,
+                                          .time_slice = 0};
 
     ret = osal_task_create(&producer_config, &producer_handle);
     if (ret != OSAL_OK) {
@@ -160,15 +154,13 @@ int main(void)
 
     printf("Producer task created successfully\n");
 
-    /* åˆ›å»ºæ¶ˆè´¹è€…ä»»åŠ¡ */
-    osal_task_config_t consumer_config = {
-        .name = "Consumer",
-        .func = consumer_task,
-        .param = &consumer_param,
-        .stack_size = 512,
-        .priority = OSAL_PRIORITY_NORMAL,
-        .time_slice = 0
-    };
+    /* ´´½¨Ïû·ÑÕßÈÎÎñ */
+    osal_task_config_t consumer_config = {.name = "Consumer",
+                                          .func = consumer_task,
+                                          .param = &consumer_param,
+                                          .stack_size = 512,
+                                          .priority = OSAL_PRIORITY_NORMAL,
+                                          .time_slice = 0};
 
     ret = osal_task_create(&consumer_config, &consumer_handle);
     if (ret != OSAL_OK) {
@@ -181,15 +173,13 @@ int main(void)
 
     printf("Consumer task created successfully\n");
 
-    /* åˆ›å»ºç»Ÿè®¡ä»»åŠ¡ */
-    osal_task_config_t stats_config = {
-        .name = "Statistics",
-        .func = stats_task,
-        .param = NULL,
-        .stack_size = 256,
-        .priority = OSAL_PRIORITY_LOW,
-        .time_slice = 0
-    };
+    /* ´´½¨Í³¼ÆÈÎÎñ */
+    osal_task_config_t stats_config = {.name = "Statistics",
+                                       .func = stats_task,
+                                       .param = NULL,
+                                       .stack_size = 256,
+                                       .priority = OSAL_PRIORITY_LOW,
+                                       .time_slice = 0};
 
     ret = osal_task_create(&stats_config, &stats_handle);
     if (ret != OSAL_OK) {
@@ -204,38 +194,31 @@ int main(void)
     printf("Statistics task created successfully\n");
     printf("Starting OSAL scheduler...\n\n");
 
-    /* å¯åŠ¨è°ƒåº¦å™¨ */
+    /* Æô¶¯µ÷¶ÈÆ÷ */
     ret = osal_start();
     if (ret != OSAL_OK) {
         printf("OSAL start failed: %s\n", osal_strerror(ret));
     }
 
-    /* æ°¸ä¸è¿”å› */
+    /* ÓÀ²»·µ»Ø */
     return 0;
 }
 
-/* ==================== Hookå‡½æ•°å®ç° ==================== */
+/* ==================== Hookº¯ÊıÊµÏÖ ==================== */
 
 /**
- * @brief OSALåˆå§‹åŒ–å®ŒæˆHook
+ * @brief OSAL³õÊ¼»¯Íê³ÉHook
  */
-void osal_init_hook(void)
-{
-    printf("osal_init_hook: Custom initialization\n");
-}
+void osal_init_hook(void) { printf("osal_init_hook: Custom initialization\n"); }
 
 /**
- * @brief OSALå¯åŠ¨å‰Hook
+ * @brief OSALÆô¶¯Ç°Hook
  */
-void osal_start_hook(void)
-{
-    printf("osal_start_hook: About to start scheduler\n");
-}
+void osal_start_hook(void) { printf("osal_start_hook: About to start scheduler\n"); }
 
 /**
- * @brief å†…å­˜åˆ†é…å¤±è´¥Hook
+ * @brief ÄÚ´æ·ÖÅäÊ§°ÜHook
  */
-void osal_malloc_failed_hook(uint32_t size)
-{
+void osal_malloc_failed_hook(uint32_t size) {
     printf("osal_malloc_failed_hook: Failed to allocate %u bytes\n", (unsigned int)size);
 }

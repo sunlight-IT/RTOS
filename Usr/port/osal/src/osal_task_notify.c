@@ -22,8 +22,8 @@ static const osal_task_notify_ops_t* osal_get_task_notify_ops(void) {
 
 /* ==================== 任务通知操作接口实现 ==================== */
 
-osal_status_t osal_task_notify(osal_task_t task, uint32_t value, uint8_t action,
-                               uint32_t* prev_value) {
+osal_status_t osal_task_notify_set(osal_task_t task, uint32_t value, uint8_t action,
+                                   uint32_t* prev_value) {
     const osal_task_notify_ops_t* ops = osal_get_task_notify_ops();
     if (ops == NULL || ops->notify == NULL) {
         return OSAL_ERROR_NOT_INIT;

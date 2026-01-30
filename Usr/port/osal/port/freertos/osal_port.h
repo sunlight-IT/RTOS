@@ -61,8 +61,11 @@
 
 /* ==================== 优先级映射 ==================== */
 
-#define OSAL_PRIORITY_TO_FREERTOS(prio) (tskIDLE_PRIORITY + (prio))
-#define FREERTOS_PRIORITY_TO_OSAL(prio) ((osal_priority_t)((prio) - tskIDLE_PRIORITY))
+#define OSAL_PRIORITY_TO_FREERTOS(prio) \
+    osal_makeFreeRtosPriority(prio) /**< 将OSAL优先级转换为FreeRTOS优先级 */
+#define FREERTOS_PRIORITY_TO_OSAL(prio) \
+    ((osal_priority_t)((prio) - OSAL_IDLE_PRIORITY)) /**< 将FreeRTOS优先级转换为OSAL优先级 */
+#define OSAL_IDLE_PRIORITY tskIDLE_PRIORITY          /**< 空闲优先级 */
 
 /* ==================== 适配层接口 ==================== */
 

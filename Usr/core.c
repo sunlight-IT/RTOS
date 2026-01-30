@@ -1,5 +1,6 @@
 #include "core.h"
 
+#include "SEGGER_RTT.h"
 #include "app/app_led.h"
 #include "app/work_queue.h"
 #include "app/work_timer.h"
@@ -21,15 +22,17 @@ static osal_task_t defaultTaskHandle;
 
 void StartDefaultTask(void const* argument) { core_main(); }
 
-void osal_init_hook(void) {
+void osal_start_hook(void) {
     const osal_task_config_t config = {.name = "DefaultTask",
                                        .func = (osal_task_func_t)StartDefaultTask,
                                        .param = NULL,
                                        .stack_size = 128 * sizeof(StackType_t),
-                                       .priority = osPriorityNormal,
+                                       .priority = osalPriorityNormal,
                                        .time_slice = 0};
     osal_task_create(&config, &defaultTaskHandle);
 }
+
+void osal_init_hook(void) { SEGGER_RTT_Init(); }
 void app_work_queue_init(void) {
     work_queue_init(&work_queue_object);
     work_queue_init(&work_queue_object_2);
@@ -66,19 +69,20 @@ void core_init(void) {
 event_message_t led_blink = {EVENT_LED_BLINK, NULL, 0};
 
 void core_scheduler(void) {
-    QueueHandle_t event_queue = get_event_msgq();
+    osal_queue_t event_queue = get_event_msgq();
     event_message_t event_message_log = {EVENT_LOG_PRINT, (void*)s_str_work_queue,
                                          sizeof(s_str_work_queue), EVENT_STATIC};
     event_message_t event_message_led = {EVENT_LED_BLINK, NULL, 0, EVENT_STATIC};
     event_schedule();
-
+    check_memory();
     while (1) {
-        xQueueSendToBack(event_queue, &event_message_led, 100);
-        xQueueSendToBack(event_queue, &event_message_log, 100);
-        if (xTaskGetTickCount() >= 20000) {
+        // xQueueSendToBack(event_queue, &event_message_led, 100);
+        osal_queue_send(event_queue, &event_message_led, 100);
+        osal_queue_send(event_queue, &event_message_log, 100);
+        if (osal_task_get_tick_count() >= 20000) {
             // app_work_queue_add_single(app_remove_timer_note, NULL, 1);
         }
-        osDelay(500);
+        osal_task_delay(500);
     }
 }
 

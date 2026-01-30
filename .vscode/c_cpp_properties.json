@@ -15,6 +15,7 @@
                 "./Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3",
                 "./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang",
                 "./Usr/port/osal/inc",
+                "./Usr/tool/RTT",
                 // "./TraceRecorder/include",
                 // "./TraceRecorder/config",
                 // "./TraceRecorder/RingBuffer/include",

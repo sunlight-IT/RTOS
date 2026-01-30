@@ -48,8 +48,8 @@ void* osal_port_freertos_memory_calloc(uint32_t num, uint32_t size) {
     return ptr;
 }
 
-uint32_t osal_port_freertos_memory_get_free_size(void) { return xPortGetFreeHeapSize(); }
+size_t osal_port_freertos_memory_get_free_size(void) { return xPortGetFreeHeapSize(); }
 
-uint32_t osal_port_freertos_memory_get_minimum_free_size(void) {
+size_t osal_port_freertos_memory_get_minimum_free_size(void) {
     return xPortGetMinimumEverFreeHeapSize();
 }
