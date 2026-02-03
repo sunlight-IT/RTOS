@@ -9,11 +9,9 @@
 
 static event_object_t event_table[EVENT_MAX] = {NULL};
 
-static zThread_t event_priority_thread;
-static osMailQId event_queue;
+// static osMailQId event_queue;
 
 static zThreadOS_t event_thread_os;
-
 static event_type event_priority_table[EVENT_PRIORITY_MAX][10];  // 事件优先级表 10个事件
 
 static void event_dispatch(event_message_t* msg);  // 事件调度
@@ -24,7 +22,7 @@ void event_register(event_type type, event_cb cb) {
         return;
     }
 
-    osMutexWait(event_thread_os.mutex, 0);
+    osMutexAcquire(event_thread_os.mutex, 0);
     if (NULL == event_table[type].callback) {
         event_table[type].callback = cb;
     } else {
@@ -38,7 +36,7 @@ void event_remove(event_type type) {
         return;
     }
 
-    osMutexWait(event_thread_os.mutex, 0);
+    osMutexAcquire(event_thread_os.mutex, 0);
     if (NULL != event_table[type].callback) {
         event_table[type].callback = NULL;
     } else {
@@ -52,14 +50,12 @@ void event_task(void* arg) {
 
     event_message_t msg;
     uint32_t err;
-    err = xQueueReceive(event_thread_os.queue, &msg, 100);
+    err = osMessageQueueGet(event_thread_os.queue, &msg, 0,100);
     LOGI("event_task : %d", err);
-    if (pdTRUE == err) {
+    if (osOK == err) {
         event_dispatch(&msg);
     }
 
-    if (err == pdTRUE) {
-    }
     osDelay(10);
 }
 
@@ -91,7 +87,7 @@ void event_dispatch(event_message_t* msg) {
         return;
     }
     event_cb cb = NULL;
-    if (osOK == osMutexWait(event_thread_os.mutex, 0)) {
+    if (osOK == osMutexAcquire(event_thread_os.mutex, 0)) {
         if (event_table[msg->type].callback) {
             cb = event_table[msg->type].callback;
         } else {
@@ -107,7 +103,7 @@ void event_dispatch(event_message_t* msg) {
     }
 }
 
-QueueHandle_t get_event_msgq(void) { return event_thread_os.queue; }
+osMessageQueueId_t get_event_msgq(void) { return event_thread_os.queue; }
 
 // void event_priority_process(osEvent event) { event.value.p }
 

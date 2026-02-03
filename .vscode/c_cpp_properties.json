@@ -14,10 +14,7 @@
                 "./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS",
                 "./Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3",
                 "./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang",
-                "./TraceRecorder/include",
-                "./TraceRecorder/config",
-                "./TraceRecorder/RingBuffer/include",
-                "./TraceRecorder/config",
+                "./Middlewares/Third_Party/FreeRTOS/Source/portable/SEGGER_SYSVIEW",
                 "./Usr"
             ],
             "defines": [

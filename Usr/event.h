@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
 
 typedef enum {
     EVENT_NONE = 0,
@@ -39,6 +39,6 @@ typedef struct {
 void event_init(void);
 void event_schedule(void);
 // osMailQId get_event_msgq(void);
-QueueHandle_t get_event_msgq(void);
+osMessageQueueId_t get_event_msgq(void);
 
 void event_register(event_type type, event_cb cb);

@@ -1,6 +1,5 @@
 #include "core.h"
 
-#include "app/app_led.h"
 #include "app/work_queue.h"
 #include "app/work_timer.h"
 #include "event.h"
@@ -12,15 +11,12 @@ static const uint8_t s_str_work_queue[] = "I am work queue test message";
 static const uint8_t s_str_work_queue2[] = "I am work queue2 test message";
 static const uint8_t s_str_work_timer[] = "I am work timer test message";
 
-static work_queue_t work_queue_object;
-static work_queue_t work_queue_object_2;
 static work_timer_t work_timer;
 
 void StartDefaultTask(void const* argument) { core_main(); }
 
 void app_work_queue_init(void) {
-    work_queue_init(&work_queue_object);
-    work_queue_init(&work_queue_object_2);
+    work_queue_init();
 }
 
 void app_work_queue_add_single(void (*work_func)(void*), void* arg, TickType_t xValue) {}
@@ -35,9 +31,9 @@ void app_work_timer_add(void (*work_func)(void*), void* arg, TickType_t xValue, 
     work_timer_node_add(&work_timer, id, xValue, work_func, arg);
 }
 
-void app_log(void* arg) { LOGI("app_log: %s\n", (char*)arg); }
+void app_log(event_message_t* arg) { LOGI("app_log: %s\n", (char*)arg->data); }
 
-void app_light(void* arg) {
+void app_light(event_message_t* arg) {
     DEBUG_LIGHT_TOGGLE;
     LOGI("led loop blink\n");
 }
@@ -74,7 +70,7 @@ void core_init(void) {
 event_message_t led_blink = {EVENT_LED_BLINK, NULL, 0};
 
 void core_scheduler(void) {
-    QueueHandle_t event_queue = get_event_msgq();
+    osMessageQueueId_t event_queue = get_event_msgq();
     event_message_t event_message_log = {EVENT_LOG_PRINT, (void*)s_str_work_queue,
                                          sizeof(s_str_work_queue), EVENT_STATIC};
     event_message_t event_message_led = {EVENT_LED_BLINK, NULL, 0, EVENT_STATIC};
