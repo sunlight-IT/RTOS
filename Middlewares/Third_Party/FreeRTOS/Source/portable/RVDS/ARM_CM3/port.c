@@ -416,13 +416,19 @@ void xPortSysTickHandler( void )
 	known - therefore the slightly faster vPortRaiseBASEPRI() function is used
 	in place of portSET_INTERRUPT_MASK_FROM_ISR(). */
 	vPortRaiseBASEPRI();
+	traceISR_ENTER();
+	//  SEGGER_RTT_printf(0, "%08x, %08x\r\n",SEGGER_SYSVIEW_GET_TIMESTAMP(),SEGGER_SYSVIEW_GET_INTERRUPT_ID());
 	{
 		/* Increment the RTOS tick. */
 		if( xTaskIncrementTick() != pdFALSE )
 		{
+			traceISR_EXIT_TO_SCHEDULER();
 			/* A context switch is required.  Context switching is performed in
 			the PendSV interrupt.  Pend the PendSV interrupt. */
 			portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT;
+		}else
+		{
+			traceISR_EXIT();
 		}
 	}
 	vPortClearBASEPRIFromISR();

@@ -29,7 +29,7 @@ typedef struct {
     event_mesage_memory memory_type;
 } event_message_t;
 
-typedef void (*event_cb)(event_message_t* message);
+typedef void (*event_cb)(void* data);
 
 typedef struct {
     event_cb callback;
@@ -42,3 +42,4 @@ void event_schedule(void);
 osMessageQueueId_t get_event_msgq(void);
 
 void event_register(event_type type, event_cb cb);
+void event_send(event_message_t* msg);

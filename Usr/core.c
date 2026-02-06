@@ -1,8 +1,7 @@
 #include "core.h"
 
 #include "app/work_queue.h"
-#include "app/work_timer.h"
-#include "event.h"
+#include "app/event.h"
 #include "gpio.h"
 #include "log/my_log.h"
 #include "tool/debug_light.h"
@@ -11,7 +10,6 @@ static const uint8_t s_str_work_queue[] = "I am work queue test message";
 static const uint8_t s_str_work_queue2[] = "I am work queue2 test message";
 static const uint8_t s_str_work_timer[] = "I am work timer test message";
 
-static work_timer_t work_timer;
 
 void StartDefaultTask(void const* argument) { core_main(); }
 
@@ -23,17 +21,10 @@ void app_work_queue_add_single(void (*work_func)(void*), void* arg, TickType_t x
 
 void app_work_queue_add_loop(void (*work_func)(void*), void* arg, TickType_t xValue) {}
 
-void app_remove_timer_note(void* arg) { work_timer_node_remove(&work_timer, 1); }
-void app_work_timer_init(void) { work_timer_init(&work_timer); }
 
-void app_work_timer_scheduler_start(void) { work_timer_start(&work_timer, 1000); }
-void app_work_timer_add(void (*work_func)(void*), void* arg, TickType_t xValue, uint32_t id) {
-    work_timer_node_add(&work_timer, id, xValue, work_func, arg);
-}
+void app_log(char* data) { LOGI("app_log: %s\n", data); }
 
-void app_log(event_message_t* arg) { LOGI("app_log: %s\n", (char*)arg->data); }
-
-void app_light(event_message_t* arg) {
+void app_light(void* arg) {
     DEBUG_LIGHT_TOGGLE;
     LOGI("led loop blink\n");
 }
@@ -79,7 +70,7 @@ void core_scheduler(void) {
     // app_work_timer_scheduler_start();
     // work_queue_schedule(&work_queue_object);
     // work_queue_schedule(&work_queue_object_2);
-
+int i = 0;
     while (1) {
         // LOGI("SEND EVENT BLINK");
         // LOGI("msg: %s\n", (char *)s_str);
@@ -87,11 +78,14 @@ void core_scheduler(void) {
         // osMessagePut(get_led_msgq(), (uint32_t)s_str, 0);
         // osMailPut(get_event_msgq(), &led_blink);
         // DEBUG_LIGHT_TOGGLE;
-        xQueueSendToBack(event_queue, &event_message_led, 100);
-        xQueueSendToBack(event_queue, &event_message_log, 100);
-        if (xTaskGetTickCount() >= 20000) {
+        event_send(&event_message_led);
+        event_send(&event_message_log);
+        if (osKernelGetTickCount() >= 20000) {
             // app_work_queue_add_single(app_remove_timer_note, NULL, 1);
         }
+        SEGGER_SYSVIEW_Print("PING");
+        //  SEGGER_RTT_printf(0, "Hello World!\r\n");
+        
         osDelay(500);
     }
 }

@@ -1,4 +1,4 @@
-#include "event.h"
+#include "app/event.h"
 
 #include <stdbool.h>
 #include <string.h>
@@ -30,6 +30,9 @@ void event_register(event_type type, event_cb cb) {
     }
     osMutexRelease(event_thread_os.mutex);
 }
+void event_send(event_message_t* msg) {
+    osMessageQueuePut(event_thread_os.queue, msg, 0, 100);
+}
 void event_remove(event_type type) {
     if (EVENT_MAX <= type) {
         LOGE("event_register : %d", type);
@@ -56,7 +59,7 @@ void event_task(void* arg) {
         event_dispatch(&msg);
     }
 
-    osDelay(10);
+    osDelay(100);
 }
 
 void event_init(void) {
@@ -69,7 +72,7 @@ void event_init(void) {
     // osMailQDef(event_queue, 5, event_message_t);
     // event_queue = osMailCreate(osMailQ(event_queue), event_thread.id);
 
-    if (1 != zThread_create(&event_thread_os, "event_process", event_task, osPriorityNormal)) {
+    if (1 != zThread_create(&event_thread_os, "event_process", event_task, osPriorityNormal, sizeof(event_message_t))) {
         LOGE("zThread_create event_process error");
     }
 }
@@ -92,6 +95,7 @@ void event_dispatch(event_message_t* msg) {
             cb = event_table[msg->type].callback;
         } else {
             LOGE("event_dispatch msg->type: %d is NULL", msg->type);
+            osMutexRelease(event_thread_os.mutex);
             return;
         }
 

@@ -76,7 +76,7 @@ extern "C" {
 // based on compiler-/toolchain-specific defines
 // to define SEGGER_SYSVIEW_GET_INTERRUPT_ID and SEGGER_SYSVIEW_GET_TIMESTAMP
 //
-#define SEGGER_SYSVIEW_CORE_OTHER   0
+#define SEGGER_SYSVIEW_CORE_OTHER   2
 #define SEGGER_SYSVIEW_CORE_CM0     1 // Cortex-M0/M0+/M1
 #define SEGGER_SYSVIEW_CORE_CM3     2 // Cortex-M3/M4/M7
 #define SEGGER_SYSVIEW_CORE_RX      3 // Renesas RX
@@ -449,7 +449,7 @@ extern "C" {
 *    is locked when writing the packet to the RTT buffer.
 */
 #ifndef   SEGGER_SYSVIEW_USE_STATIC_BUFFER
-  #define SEGGER_SYSVIEW_USE_STATIC_BUFFER        1
+  #define SEGGER_SYSVIEW_USE_STATIC_BUFFER        0
 #endif
 
 /*********************************************************************

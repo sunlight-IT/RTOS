@@ -61,6 +61,6 @@ typedef struct _zThreadOS_t {
 } zThreadOS_t;
 
 uint32_t zThread_create(zThreadOS_t* thread, const char* name, thread_callback cb,
-                          osPriority_t priority);
+                          osPriority_t priority,size_t msg_size);
 uint8_t zThread_schedule(zThreadOS_t* thread);
 void zThread_waiting(zThreadOS_t* thread);

@@ -151,7 +151,7 @@ void work_queue_init(void) {
     // }
 
     err = zThread_create(&s_thread_os, "work_queue_thread", work_queue_thread,
-                             osPriorityNormal);
+                             osPriorityNormal, sizeof(work_node_t *));
 
     if (err) {
         LOGE("work_queue_thread zThread_create error");

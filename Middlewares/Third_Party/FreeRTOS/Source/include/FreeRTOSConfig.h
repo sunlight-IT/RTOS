@@ -56,7 +56,6 @@
 
 /* self define */
 #define INCLUDE_xTaskGetIdleTaskHandle 1
-#define INCLUDE_pxTaskGetStackStart     1
 // #define portALT_GET_RUN_TIME_COUNTER_VALUE() (xPortSysTickHandler())
 
 /* #define configUSE_PORT_OPTIMISED_TASK_SELECTION	0*/

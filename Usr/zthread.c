@@ -22,6 +22,7 @@ void thread_process(void* args) {
 
         while (k_Thread_status_running == thread->status) {
             thread->cb(thread->cb_arg);
+            
         }
 
         osDelay(1000);
@@ -29,7 +30,7 @@ void thread_process(void* args) {
 }
 
 uint32_t zThread_create(zThreadOS_t* thread, const char* name, thread_callback cb,
-                          osPriority_t priority) {
+                          osPriority_t priority,size_t msg_size) {
                             uint32_t err = false;
     if (thread == NULL || cb == NULL) {
         err = false;
@@ -51,7 +52,7 @@ uint32_t zThread_create(zThreadOS_t* thread, const char* name, thread_callback c
         .mq_mem = NULL,//用于静态队列内存使用
         .mq_size = 0,
     };
-    thread->queue = osMessageQueueNew(10, sizeof(uint32_t), &queue_attr);
+    thread->queue = osMessageQueueNew(10, msg_size, &queue_attr);
     
     osThreadAttr_t thread_attr = {
         .name = name,

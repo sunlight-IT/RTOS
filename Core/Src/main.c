@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 
 #include "core.h"
+#include "bsp_dwt.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -87,7 +88,9 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-    __set_PRIMASK(0);
+    // __set_PRIMASK(0);
+    NVIC_SetPriorityGrouping(0);
+    bsp_InitDWT();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -97,9 +100,14 @@ int main(void)
   MX_USART2_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+
+  
+
   /* USER CODE BEGIN 2 */
   SEGGER_SYSVIEW_Conf();
+  // SEGGER_RTT_Init();
   SEGGER_SYSVIEW_Start();
+
   /* USER CODE END 2 */
 
   /* Init scheduler */

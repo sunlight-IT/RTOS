@@ -24,8 +24,8 @@ void memory_monitor_thread_init(void) {
     //     LOGE("%s create error", (osThread(memory_monitor))->name);
     // }
 
-    if (false != zThread_create(&memory_thread_os, "Memory_monitor", memory_monitor_thread,
-                            osPriorityNormal)) {
+    if (true != zThread_create(&memory_thread_os, "Memory_monitor", memory_monitor_thread,
+                            osPriorityNormal, sizeof(uint32_t))) {
         LOGE("memory_monitor zThread_create error");
     }
 }
