@@ -28,7 +28,7 @@
 /* USER CODE BEGIN Includes */
 
 #include "core.h"
-#include "bsp_dwt.h"
+#include "bsp/bsp_dwt.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

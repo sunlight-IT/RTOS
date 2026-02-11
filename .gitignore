@@ -2,4 +2,6 @@
 Debug
 .mxproject
 build
-MDK-ARM
+MDK-ARM/DebugConfig
+MDK-ARM/Project
+MDK-ARM/test
