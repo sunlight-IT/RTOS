@@ -1,23 +1,30 @@
 #pragma once
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
+#include "queue.h"
+#include "semphr.h"
+#include "event_groups.h"
+
 
 typedef void (*thread_callback)(void*);
 typedef void (*event_callback)(void);
 
 typedef struct _zThread_t {
     /* Thread ID */
-    osThreadId id;
+    TaskHandle_t id;
     const char* name;
 
     /* Event message queue */
-    osMessageQId queue;
-    osEvent event_message;
+    QueueHandle_t    queue;
+    EventBits_t event_message;
 
     /* Semaphore */
-    osSemaphoreId semaphore;
+    SemaphoreHandle_t semaphore;
 
     /* Mutex */
-    osMutexId mutex;
+    SemaphoreHandle_t mutex;
 
     /* Event group */
     EventGroupHandle_t event_group;
@@ -37,15 +44,15 @@ typedef enum zThread_status {
 
 typedef struct _zThreadOS_t {
     /* Thread ID */
-    TaskHandle_t handle;
+    osThreadId_t handle;
     /* Event message queue */
-    QueueHandle_t queue;
+    osMessageQueueId_t queue;
     /* Semaphore */
-    SemaphoreHandle_t sem;
+    osSemaphoreId_t semaphore;
     /* Mutex */
-    SemaphoreHandle_t mutex;
+    osMutexId_t mutex;
     /* Event group */
-    EventGroupHandle_t event_group;
+    // osEventFlagsId_t event_group;
 
     thread_callback cb;
     void* cb_arg;
@@ -53,7 +60,7 @@ typedef struct _zThreadOS_t {
     e_zThread_status status;
 } zThreadOS_t;
 
-BaseType_t zThread_create(zThreadOS_t* thread, const char* name, thread_callback cb,
-                          UBaseType_t priority);
+uint32_t zThread_create(zThreadOS_t* thread, const char* name, thread_callback cb,
+                          osPriority_t priority,size_t msg_size);
 uint8_t zThread_schedule(zThreadOS_t* thread);
 void zThread_waiting(zThreadOS_t* thread);

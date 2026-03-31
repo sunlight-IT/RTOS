@@ -2,7 +2,7 @@
 
 #include <stdarg.h>
 
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
 #include "core.h"
 #include "usart.h"
 
@@ -19,11 +19,16 @@
 // }
 
 static char s_buff_str[128];
-static osMutexId s_log_mutex;
+static osMutexId_t s_log_mutex;
 
 void zlog_init(void) {
-    osMutexDef(LOG_MUTEX);
-    s_log_mutex = osMutexCreate(osMutex(LOG_MUTEX));
+    osMutexAttr_t LOG_MUTEX = {
+        .name = "log_mutex",
+        .attr_bits = osMutexPrioInherit,
+        .cb_mem = NULL,
+        .cb_size = 0,
+    };
+    s_log_mutex = osMutexNew(&LOG_MUTEX);
 }
 
 void zlog(const char* fmt, ...) {
@@ -33,7 +38,7 @@ void zlog(const char* fmt, ...) {
     /* rtos要用信号量锁住*/
 
 #if _RTOS
-    osMutexWait(s_log_mutex, osWaitForever);
+    osMutexAcquire(s_log_mutex, osWaitForever);
 #endif
 
     va_list args;
@@ -53,7 +58,7 @@ void zlog(const char* fmt, ...) {
 
 uint32_t zlog_get_tick(void) {
 #if _RTOS
-    return xTaskGetTickCount();
+    return osKernelGetTickCount();
 #else
     return HAL_GetTick();
 #endif

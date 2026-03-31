@@ -2,9 +2,11 @@
 
 #include "log/my_log.h"
 
+#include <stdbool.h>
+
 #define LOOP_TABLE_MAX 10
 
-static void work_queue_remove(work_queue_t *work_queue);
+static void work_queue_remove(void);
 
 static void work_singal_process(work_node_t *work_node);
 static void work_loop_process(work_node_t *work_node);
@@ -14,25 +16,28 @@ static void work_node_status_set(work_node_t *node, e_work_loop_status_t status)
 static work_node_t *loop_table[LOOP_TABLE_MAX];
 static uint8_t loop_table_index = 0;
 
-void work_queue_schedule(work_queue_t *work_queue) { osSignalSet(work_queue->work_thread, 0x02); }
+static work_queue_t s_work_queue;
+static zThreadOS_t s_thread_os;
+
+void work_queue_schedule(void) { zThread_schedule(s_work_queue.work_thread); }
 /*
  * @brief 工作队列线程
  *
  * @param void* 工作队列参数指针，初始化时传入
  */
-void work_queue_thread(void *pvParameters) {
-    osSignalWait(0x02, osWaitForever);  // 可以加入线程任务状态，可以挂起线程
-    LOGI("work_queue_thread start");
-    work_queue_t *work_queue = (work_queue_t *)pvParameters;
-    work_node_t *work_node_now = NULL;
-    work_node_t *work_node_last = NULL;
-    uint8_t item_cnt = 0;
-    while (1) {
-        work_queue_remove(work_queue);
 
-        if (pdFALSE == listLIST_IS_EMPTY(&work_queue->work_list)) {
-            for (work_node_now = (work_node_t *)(listGET_HEAD_ENTRY(&work_queue->work_list));
-                 item_cnt < listCURRENT_LIST_LENGTH(&work_queue->work_list); item_cnt++) {
+
+void work_queue_thread(void *pvParameters) {
+    LOGI("work_queue_thread start");
+    // work_queue_t *work_queue = (work_queue_t *)pvParameters;
+ static work_node_t *work_node_now ;
+ static work_node_t *work_node_last ;
+ static uint8_t item_cnt; 
+
+        work_queue_remove();
+        if (pdFALSE == listLIST_IS_EMPTY(&s_work_queue.work_list)) {
+            for (work_node_now = (work_node_t *)(listGET_HEAD_ENTRY(&s_work_queue.work_list));
+                 item_cnt < listCURRENT_LIST_LENGTH(&s_work_queue.work_list); item_cnt++) {
                 if (work_node_now != NULL) {
                     switch (work_node_now->mode) {
                         case k_WORK_NODE_LOOP:
@@ -47,11 +52,13 @@ void work_queue_thread(void *pvParameters) {
                 work_node_now = (work_node_t *)listGET_NEXT(&(work_node_now->list_item));
                 work_loop_check(work_node_last);
             }
+            work_node_now = NULL;
+            work_node_last = NULL;
             item_cnt = 0;
         }
 
         vTaskDelay(pdMS_TO_TICKS(10));
-    }
+    
 }
 
 /*
@@ -60,13 +67,18 @@ void work_queue_thread(void *pvParameters) {
  *          status 状态
  * @return: void
  */
-static void work_loop_status_set(work_queue_t *work_queue, TickType_t loop_index,
+static void work_loop_status_set( TickType_t loop_index,
                                  e_work_loop_status_t status) {
     uint8_t item_cnt = 0;
 
-    xSemaphoreTake(work_queue->lock, portMAX_DELAY);
-    for (work_node_t *work_node = (work_node_t *)(listGET_HEAD_ENTRY(&work_queue->work_list));
-         item_cnt < listCURRENT_LIST_LENGTH(&work_queue->work_list); item_cnt++) {
+    if (s_thread_os.queue == NULL) {
+        LOGE("work_loop_status_set work_queue is null");
+        return;
+    }
+
+    osMutexAcquire(s_work_queue.lock, portMAX_DELAY);
+    for (work_node_t *work_node = (work_node_t *)(listGET_HEAD_ENTRY(&s_work_queue.work_list));
+         item_cnt < listCURRENT_LIST_LENGTH(&s_work_queue.work_list); item_cnt++) {
         if (NULL == work_node) {
             continue;
         }
@@ -74,7 +86,7 @@ static void work_loop_status_set(work_queue_t *work_queue, TickType_t loop_index
             work_node->status = status;
         }
     }
-    xSemaphoreGive(work_queue->lock);
+    osMutexRelease(s_work_queue.lock);
 }
 
 /*
@@ -82,8 +94,8 @@ static void work_loop_status_set(work_queue_t *work_queue, TickType_t loop_index
  * @param:  loop_index 循环工作索引
  * @return: void
  */
-void work_loop_task_del(work_queue_t *work_queue, TickType_t loop_index) {
-    work_loop_status_set(work_queue, loop_index, k_WORK_STATUS_DELETED);
+void work_loop_task_del( TickType_t loop_index) {
+    work_loop_status_set( loop_index, k_WORK_STATUS_DELETED);
 }
 
 /*
@@ -91,8 +103,8 @@ void work_loop_task_del(work_queue_t *work_queue, TickType_t loop_index) {
  * @param:  loop_index 循环工作索引
  * @return: void
  */
-void work_loop_task_running(work_queue_t *work_queue, TickType_t loop_index) {
-    work_loop_status_set(work_queue, loop_index, k_WORK_STATUS_RUNNING);
+void work_loop_task_running( TickType_t loop_index) {
+    work_loop_status_set( loop_index, k_WORK_STATUS_RUNNING);
 }
 
 /*
@@ -100,8 +112,8 @@ void work_loop_task_running(work_queue_t *work_queue, TickType_t loop_index) {
  * @param:  loop_index 循环工作索引
  * @return: void
  */
-void work_loop_task_pending(work_queue_t *work_queue, TickType_t loop_index) {
-    work_loop_status_set(work_queue, loop_index, k_WORK_STATUS_PEND);
+void work_loop_task_pending( TickType_t loop_index) {
+    work_loop_status_set( loop_index, k_WORK_STATUS_PEND);
 }
 
 /*
@@ -109,16 +121,43 @@ void work_loop_task_pending(work_queue_t *work_queue, TickType_t loop_index) {
  *
  * @param work_queue* 工作队列指针
  */
-void work_queue_init(work_queue_t *work_queue) {
-    work_queue->lock = xSemaphoreCreateMutex();
-    // vQueueAddToRegistry(work_queue->sem, "work_queue_sem");
-    work_queue->queue = xQueueCreate(10, sizeof(work_node_t *));
-    // vQueueAddToRegistry(work_queue->work_queue, "work_queue");
-    
-    xTaskCreate(work_queue_thread, "work_queue_thread", 256, work_queue, 5,
-                &(work_queue->work_thread));
+void work_queue_init(void) {
 
-    vListInitialise(&work_queue->work_list);
+    uint32_t err = false;
+
+    // osMutexAttr_t mutex_attr = {
+    //     .name = "work_queue_mutex",
+    //     .attr_bits = osMutexPrioInherit,
+    //     .cb_mem = NULL,
+    //     .cb_size = 0,
+    // };
+    // s_work_queue.lock = osMutexNew(&mutex_attr);
+    // if (s_work_queue.lock == NULL) {
+    //     return err;
+    // }
+    // // vQueueAddToRegistry(work_queue->sem, "work_queue_sem");
+    // osMessageQueueAttr_t queue_attr = {
+    //     .name = "work_queue_queue",
+    //     .attr_bits = 0,
+    //     .cb_mem = NULL,//用于静态队列内存使用
+    //     .cb_size = 0,
+    //     .mq_mem = NULL,//用于静态队列内存使用
+    //     .mq_size = 0,
+    // };
+    // s_work_queue.queue = osMessageQueueNew(10, sizeof(work_node_t *), &queue_attr);
+    // // vQueueAddToRegistry(work_queue->work_queue, "work_queue");
+    // if(s_work_queue.queue == NULL) {
+    //     return err;
+    // }
+
+    err = zThread_create(&s_thread_os, "work_queue_thread", work_queue_thread,
+                             osPriorityNormal, sizeof(work_node_t *));
+
+    if (err) {
+        LOGE("work_queue_thread zThread_create error");
+    }
+
+    vListInitialise(&s_work_queue.work_list);
 }
 
 /*
@@ -129,14 +168,16 @@ void work_queue_init(work_queue_t *work_queue) {
  * @param void (*work_func)(void *) 工作执行函数
  * @param void *arg                 工作执行函数参数
  */
-void work_queue_add(work_queue_t *work_queue, TickType_t xValue, void (*work_func)(void *),
+void work_queue_add( TickType_t xValue, void (*work_func)(void *),
                     e_work_node_mode_t mode, void *arg) {
-    if (work_queue == NULL) {
-        LOGE("work_queue_add work_queue is null");
+    if (s_thread_os.queue == NULL) {
+        LOGE("work_queue_add queue is null");
         return;
     }
 
+    //todo 后期要换成内存池接口而不能耦合FreeRTOS
     work_node_t *work_node = pvPortMalloc(sizeof(work_node_t));  // 动态开辟列表项
+    //todo 后期要换成内存池接口而不能耦合FreeRTOS
 
     if (work_node == NULL) {
         LOGE("work_queue_add malloc fail");
@@ -152,7 +193,7 @@ void work_queue_add(work_queue_t *work_queue, TickType_t xValue, void (*work_fun
     }
     listSET_LIST_ITEM_VALUE(&work_node->list_item, xValue);
 
-    xQueueSend(work_queue->queue, &work_node,
+    osMessageQueuePut(s_thread_os.queue, &work_node, 0,
                portMAX_DELAY);  // 向工作队列中添加工作,使用也就是传递地址的方法进行数据传递
 }
 
@@ -161,18 +202,18 @@ void work_queue_add(work_queue_t *work_queue, TickType_t xValue, void (*work_fun
  *
  * @param work_queue* 工作队列指针
  */
-void work_queue_remove(work_queue_t *work_queue) {
-    if (work_queue == NULL) {
+void work_queue_remove(void) {
+    if (s_thread_os.queue == NULL) {
         LOGE("work_queue_remove work_queue is null");
         return;
     }
 
     uint32_t work_node_addr;
-    if (pdPASS == xQueueReceive(work_queue->queue, &work_node_addr, 100))  // 接收工作节点地址
+    if (pdPASS == osMessageQueueGet(s_thread_os.queue, &work_node_addr, 0, 100))  // 接收工作节点地址
     {
-        xSemaphoreTake(work_queue->lock, portMAX_DELAY);
-        vListInsert(&work_queue->work_list, &(((work_node_t *)work_node_addr)->list_item));
-        xSemaphoreGive(work_queue->lock);
+        osMutexAcquire(s_thread_os.mutex, portMAX_DELAY);
+        vListInsert(&s_work_queue.work_list, &(((work_node_t *)work_node_addr)->list_item));
+        osMutexRelease(s_thread_os.mutex);
     }  // 添加循环工作运行一次工作，就不可以使用永久阻塞了
 }
 
@@ -211,10 +252,12 @@ void work_loop_check(work_node_t *node) {
         return;
     }
 
+    //todo 后期要换成内存池接口而不能耦合FreeRTOS
     if (k_WORK_STATUS_DELETED == node->status) {
         uxListRemove(&node->list_item);
         vPortFree(node);  // 释放工作节点
     }
+    //todo 后期要换成内存池接口而不能耦合FreeRTOS
 }
 
 void work_node_status_set(work_node_t *node, e_work_loop_status_t status) { node->status = status; }
