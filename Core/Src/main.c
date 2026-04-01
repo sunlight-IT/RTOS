@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
+#include "cmsis_os2.h"
 #include "dma.h"
 #include "tim.h"
 #include "usart.h"
@@ -104,9 +104,7 @@ int main(void)
   
 
   /* USER CODE BEGIN 2 */
-  SEGGER_SYSVIEW_Conf();
-  // SEGGER_RTT_Init();
-  SEGGER_SYSVIEW_Start();
+   SEGGER_RTT_Init();
 
   /* USER CODE END 2 */
 

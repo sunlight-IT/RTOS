@@ -40,7 +40,6 @@
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
 
-#include "SEGGER_SYSVIEW_FreeRTOS.h"
 
 /* Ensure stdint is only used by the compiler, and not the assembler. */
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
