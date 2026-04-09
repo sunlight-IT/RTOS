@@ -56,4 +56,6 @@
     "C_Cpp.default.compilerPath": "E:/app_tool/VSCODE/Mingw-W64/mingw64/bin/gcc.exe",
     "C_Cpp.default.intelliSenseMode": "gcc-arm",
     "cortex-debug.variableUseNaturalFormat": false,
+    "cortex-debug.openocdPath": "D:/APP/OpenoCD/xpack-openocd-0.12.0-6/bin/openocd.exe",
+    "cmake.sourceDirectory": "D:/WorkSpace/Other_Project/STM32F103C8T6/Project/cmake",
 }

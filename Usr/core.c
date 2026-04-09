@@ -78,12 +78,12 @@ int i = 0;
         // osMessagePut(get_led_msgq(), (uint32_t)s_str, 0);
         // osMailPut(get_event_msgq(), &led_blink);
         // DEBUG_LIGHT_TOGGLE;
-        event_send(&event_message_led);
+        // event_send(&event_message_led);
         event_send(&event_message_log);
         if (osKernelGetTickCount() >= 20000) {
             // app_work_queue_add_single(app_remove_timer_note, NULL, 1);
         }
-        SEGGER_SYSVIEW_Print("PING");
+        // SEGGER_SYSVIEW_Print("PING");
         //  SEGGER_RTT_printf(0, "Hello World!\r\n");
         
         osDelay(500);

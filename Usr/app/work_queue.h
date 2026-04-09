@@ -1,5 +1,4 @@
 #pragma once
-#include "cmsis_os.h"
 #include "cmsis_os2.h"
 #include "zthread.h"
 

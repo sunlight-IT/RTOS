@@ -53,7 +53,7 @@ void event_task(void* arg) {
 
     event_message_t msg;
     uint32_t err;
-    err = osMessageQueueGet(event_thread_os.queue, &msg, 0,100);
+    err = osMessageQueueGet(event_thread_os.queue, &msg, NULL,100);
     LOGI("event_task : %d", err);
     if (osOK == err) {
         event_dispatch(&msg);

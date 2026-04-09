@@ -5,8 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Cortex Debug (OpenOCD)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "D:\\WorkSpace\\Other_Project\\STM32F103C8T6\\Project\\MDK-ARM\\Project\\Project.axf", // 修改为你的 elf 文件路径
+            "configFiles": [
+                "interface/cmsis-dap.cfg", // 告诉 OpenOCD 使用 CMSIS-DAP 调试器
+                "target/stm32f1x.cfg" // 修改为你实际使用的单片机系列配置文件
+            ],
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none",
+            "svdFile": "${workspaceFolder}/STM32F103.svd" // 可选
+        },
+        {
             "cwd": "${workspaceRoot}",
-            "executable": "./build/Project.elf",
+            "executable": "D:\\WorkSpace\\Other_Project\\STM32F103C8T6\\Project\\MDK-ARM\\Project\\Project.axf",
             "name": "Debug Microcontroller",
             "request": "launch",
             "type": "cortex-debug",

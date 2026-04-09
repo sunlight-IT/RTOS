@@ -1,0 +1,21 @@
+{
+  "name": "embedded-flasher",
+  "version": "1.0.0",
+  "description": "STM32固件自动烧录工具，配合CMake生成器实现一键构建烧录",
+  "main": "SKILL.md",
+  "readme": "README.md",
+  "scripts": {
+    "flash": "bash scripts/flash.sh",
+    "flash-py": "python scripts/flash.py"
+  },
+  "keywords": [
+    "embedded",
+    "stm32",
+    "flash",
+    "openocd",
+    "st-link",
+    "firmware"
+  ],
+  "author": "",
+  "license": "MIT"
+}

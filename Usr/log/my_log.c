@@ -18,7 +18,7 @@
 //   return ch;
 // }
 
-static char s_buff_str[128];
+static char s_buff_str[256];
 static osMutexId_t s_log_mutex;
 
 void zlog_init(void) {
@@ -43,7 +43,8 @@ void zlog(const char* fmt, ...) {
 
     va_list args;
     va_start(args, fmt);
-    strlen = vsprintf(s_buff_str, fmt, args);
+     strlen = vsnprintf(s_buff_str, sizeof(s_buff_str) - 1, fmt, args);
+    
     va_end(args);
 
     for (int i = 0; i < strlen; i++) {

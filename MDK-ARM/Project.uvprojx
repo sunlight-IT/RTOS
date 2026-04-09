@@ -587,36 +587,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>trace</GroupName>
-          <Files>
-            <File>
-              <FileName>SEGGER_RTT.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Usr\tool\SEGGER\RTT\SEGGER_RTT.c</FilePath>
-            </File>
-            <File>
-              <FileName>SEGGER_RTT_printf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Usr\tool\SEGGER\RTT\SEGGER_RTT_printf.c</FilePath>
-            </File>
-            <File>
-              <FileName>SEGGER_SYSVIEW.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Usr\tool\SEGGER\SEGGER_SYSVIEW\src\SEGGER_SYSVIEW.c</FilePath>
-            </File>
-            <File>
-              <FileName>SEGGER_SYSVIEW_Config_FreeRTOS.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Usr\tool\SEGGER\SEGGER_SYSVIEW\src\SEGGER_SYSVIEW_Config_FreeRTOS.c</FilePath>
-            </File>
-            <File>
-              <FileName>SEGGER_SYSVIEW_FreeRTOS.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Usr\tool\SEGGER\SEGGER_SYSVIEW\src\SEGGER_SYSVIEW_FreeRTOS.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Usr</GroupName>
           <Files>
             <File>
