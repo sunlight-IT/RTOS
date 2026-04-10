@@ -56,7 +56,7 @@ uint32_t zThread_create(zThreadOS_t* thread, const char* name, thread_callback c
     
     osThreadAttr_t thread_attr = {
         .name = name,
-        .stack_size = 256,
+        .stack_size = 512,
         .priority = priority,
     };
     thread->handle = osThreadNew(thread_process, (void*)thread, &thread_attr);

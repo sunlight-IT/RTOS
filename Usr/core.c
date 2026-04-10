@@ -61,7 +61,7 @@ void core_init(void) {
 event_message_t led_blink = {EVENT_LED_BLINK, NULL, 0};
 
 void core_scheduler(void) {
-    osMessageQueueId_t event_queue = get_event_msgq();
+    // osMessageQueueId_t event_queue = get_event_msgq();
     event_message_t event_message_log = {EVENT_LOG_PRINT, (void*)s_str_work_queue,
                                          sizeof(s_str_work_queue), EVENT_STATIC};
     event_message_t event_message_led = {EVENT_LED_BLINK, NULL, 0, EVENT_STATIC};
@@ -78,14 +78,14 @@ int i = 0;
         // osMessagePut(get_led_msgq(), (uint32_t)s_str, 0);
         // osMailPut(get_event_msgq(), &led_blink);
         // DEBUG_LIGHT_TOGGLE;
-        // event_send(&event_message_led);
+        event_send(&event_message_led);
         event_send(&event_message_log);
         if (osKernelGetTickCount() >= 20000) {
             // app_work_queue_add_single(app_remove_timer_note, NULL, 1);
         }
         // SEGGER_SYSVIEW_Print("PING");
         //  SEGGER_RTT_printf(0, "Hello World!\r\n");
-        
+        LOGI("GCC DEBUG test\n");
         osDelay(500);
     }
 }

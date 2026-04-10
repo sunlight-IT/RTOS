@@ -41,7 +41,9 @@
       "Bash(mkdir -p build)",
       "Bash(make:*)",
       "Bash(arm-none-eabi-nm *.elf)",
-      "Bash(grep -i \" T main$\")"
+      "Bash(grep -i \" T main$\")",
+      "Bash(rm:*)",
+      "Bash(grep -rn 'cpsid i' --include=*.c --include=*.h)"
     ]
   }
 }
