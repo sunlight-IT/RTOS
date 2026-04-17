@@ -43,7 +43,22 @@
       "Bash(arm-none-eabi-nm *.elf)",
       "Bash(grep -i \" T main$\")",
       "Bash(rm:*)",
-      "Bash(grep -rn 'cpsid i' --include=*.c --include=*.h)"
+      "Bash(grep -rn 'cpsid i' --include=*.c --include=*.h)",
+      "Read(//d/APP/Keil/Keil5MDK5.4/ARM/ARMCC/bin/**)",
+      "Bash(./fromelf.exe --help)",
+      "Bash(unset CMAKE_MAKE_PROGRAM)",
+      "Bash(D:/APP/Keil/Keil5MDK5.4/ARM/ARMCC/bin/armcc.exe\" --cpu=Cortex-M3 --c99 -g --split_sections -o D:/WorkSpace/Other_Project/STM32F103C8T6/Project/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c\")",
+      "Bash(D:/APP/Keil/Keil5MDK5.4/ARM/ARMCC/bin/armcc.exe\" --cpu=Cortex-M3 --c99 -g -o\"D:/WorkSpace/Other_Project/STM32F103C8T6/Project/test.o \")",
+      "Bash(D:/APP/Keil/Keil5MDK5.4/ARMCCARMCC/bin/armcc.exe --cpu=Cortex-M3 --c99 -g -o test.o)",
+      "Bash(D:/APP/Keil/Keil5MDK5.4/ARMCCARMCC/bin/armcc.exe\" --version 2>&1)",
+      "Bash(cmd /c \"D:/APP/Keil/Keil5MDK5.4/ARMCCARMCC/bin/armcc.exe\" --version)",
+      "Bash(cmd /c \"D:\\\\APP\\\\Keil/Keil5MDK5.4\\\\ARMCCARMCC/bin/armcc.exe\" --version)",
+      "Bash(cmd /c \"D:/WorkSpace/Other_Project/STM32F103C8T6/Project/Project/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c\" 2>&1)",
+      "Bash(dir \"D:/WorkSpace/Other_Project/STM32F103C8T6/Project/build/Project.*\")",
+      "Read(//c/Users/FF/.claude/skills/**)",
+      "Bash(dir /s /b \"C:/Users/FF/.claude/skills\")",
+      "Bash(dir \"C:\\\\Users\\\\FF\\\\.claude\\\\skills\" /b)",
+      "Bash(dir:*)"
     ]
   }
 }

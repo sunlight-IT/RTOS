@@ -1,13 +1,48 @@
-# Embedded CMake Generator 使用说明
+# Embedded CMake Generator
+
+STM32 项目 CMake 构建系统自动生成器，支持 **ARMCC (Keil MDK 5.4)** 和 **GCC** 双工具链。
 
 ## 功能特性
 
-本生成器自动为 STM32 嵌入式项目创建完整的 CMake 构建系统，包括：
+- ✅ **自动扫描**：递归扫描项目目录，收集所有源文件和头文件路径
+- ✅ **智能排除**：自动排除不需要的文件和目录
+- ✅ **双工具链支持**：自动生成 ARMCC 和 GCC 工具链配置
+- ✅ **自动选择 Port**：根据工具链自动选择 FreeRTOS port (RVDS vs GCC)
+- ✅ **自动选择启动文件**：ARMCC 使用 arm 子目录，GCC 使用根目录
+- ✅ **条件处理**：CMakeLists.txt 自动处理工具链差异
 
-- **自动扫描**：递归扫描项目目录，收集所有源文件和头文件路径
-- **智能排除**：自动排除不需要的文件和目录
-- **工具链配置**：生成 ARM GCC 工具链配置文件
-- **多输出格式**：自动生成 .elf、.hex、.bin 文件
+---
+
+## 快速开始
+
+```bash
+# 生成 CMake 工程（ARMCC 默认）
+python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py
+
+# 指定工具链
+python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py --toolchain armcc  # ARMCC
+python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py --toolchain gcc   # GCC
+
+# 构建项目（ARMCC）
+mkdir -p build && cd build
+cmake .. -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/armcc-toolchain.cmake
+make -j4
+```
+
+---
+
+## 工具链对比
+
+| 特性 | ARMCC | GCC |
+|-----|-------|-----|
+| 编译器 | armcc.exe (Keil MDK 5.4) | arm-none-eabi-gcc |
+| 链接器 | armlink.exe + scatter file | ld + linker script |
+| FreeRTOS | RVDS/ARM_CM3/port.c | GCC/ARM_CM3/port.c |
+| 启动文件 | arm/startup_stm32f103xb.s | startup_stm32f103xb.s |
+| 输出格式 | .axf, .bin | .elf, .hex, .bin |
+| 转换工具 | fromelf --bin | objcopy -O ihex/binary |
+
+---
 
 ## 自动排除规则
 
@@ -18,9 +53,9 @@
 | `build*` | 所有构建临时目录 |
 | `.git`, `.vscode`, `.idea` | 版本控制和 IDE 目录 |
 | `MDK-ARM`, `EWARM` | Keil 和 IAR 工程目录 |
-| `RVDS` | ARM RealView 编译器专用（与 GCC 不兼容）|
 | `Examples`, `Templates` | 示例和模板目录 |
 | `CMSIS_RTOS` | CMSIS-RTOS V1（与 V2 API 冲突）|
+| `RVDS` | ARM RealView 编译器专用 |
 
 ### 文件排除
 
@@ -28,100 +63,224 @@
 |---------|------|
 | `*template*` | 模板文件（不需要编译）|
 | `heap_1.c`, `heap_2.c`, `heap_3.c`, `heap_5.c` | FreeRTOS 其他 heap 实现（与 heap_4.c 冲突）|
-| `cmsis_os.c`, `cmsis_os1.c` | CMSIS-RTOS V1（与 V2 冲突）|
+| `cmsis_os.c`, `cmsis_os1.c` | CMSIS-RTOS V1（与 V2 API 冲突）|
+| `syscalls.c` | 标准库系统调用，裸机环境不需要 |
+| `SEGGER_RTT_ASM_ARMv7M.S` | 汇编优化文件（C 编译器处理问题）|
 
-## 使用方法
+---
+
+## 生成的文件
+
+```
+Project/
+├── CMakeLists.txt              # 主 CMake 配置文件（ARMCC/GCC双支持）
+├── cmake/
+│   ├── project_config.cmake   # 项目配置（源文件、头文件）
+│   ├── armcc-toolchain.cmake # ARMCC 工具链配置
+│   └── arm-none-eabi-toolchain.cmake  # GCC 工具链配置
+└── build/                    # 构建输出目录
+    ├── Project.axf           # ARMCC 可执行文件 (253KB)
+    ├── Project.bin           # 二进制烧录文件 (58KB)
+    ├── Project.htm           # HTML 映射文件 (314KB)
+    └── Project.map           # 文本映射文件 (227KB)
+```
+
+---
+
+## 常见问题与解决方案
+
+### 问题 1: CMake 测试编译失败
+
+**错误：**
+```
+No section matches selector - no section to be FIRST/LAST.
+```
+
+**原因：**
+CMake 在测试编译器时尝试链接一个简单程序，但使用了项目的 scatter file，而测试程序没有包含预期的 RESET 节。
+
+**解决方案：**
+在 `armcc-toolchain.cmake` 中添加：
+```cmake
+# 避免链接测试时使用 scatter file（重要！）
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+```
+
+---
+
+### 问题 2: fromelf 命令语法错误
+
+**错误：**
+```
+Fatal error: Q3900U: Unrecognized option '--data'.
+```
+
+**原因：**
+fromelf 不支持 `--text --data --bss` 这样的参数组合。
+
+**解决方案：**
+只使用 `--bin --output` 生成二进制文件：
+```cmake
+add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} --bin --output ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.axf
+    COMMENT "Generating .bin file"
+)
+```
+
+---
+
+### 问题 3: 输出文件名错误
+
+**错误：**
+```
+fromelf.exe: Could not open file 'Project.elf': No such file
+```
+
+**原因：**
+ARMCC 链接器默认输出 `.o` 文件，fromelf 需要 `.axf` 文件。
+
+**解决方案：**
+在 CMakeLists.txt 中设置 SUFFIX 属性：
+```cmake
+set_target_properties(${PROJECT_NAME}.elf PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+    OUTPUT_NAME ${PROJECT_NAME}
+    SUFFIX ".axf"
+)
+```
+
+---
+
+### 问题 4: Bash 路径分隔符问题
+
+**错误：**
+```
+Error: D:\WorkSpace\...\Project.elf': No such file or directory
+```
+
+**原因：**
+Windows 反斜杠在 bash 中无法正确解析。
+
+**解决方案：**
+工具链文件使用正斜杠路径：
+```cmake
+set(CMAKE_C_COMPILER "D:/APP/Keil/Keil5MDK5.4/ARM/ARMCC/bin/armcc.exe")
+```
+
+---
+
+### 问题 5: sysmem.c 链接符号不匹配
+
+**错误：**
+```
+undefined reference to `Image$$RW_IRAM1$$ZI$$Limit'
+```
+
+**原因：**
+sysmem.c 中的 `_sbrk()` 函数使用了 ARMCC scatter file 特定的符号，而 GCC 使用 linker script 符号。
+
+**解决方案：**
+根据编译器类型使用不同的符号定义（详见 SKILL.md）：
+```c
+#ifdef __GNUC__
+    extern uint32_t _end;
+    extern uint8_t _estack;
+#else
+    extern uint32_t Image$$RW_IRAM1$$ZI$$Limit;
+    const uint32_t _end = Image$$RW_IRAM1$$ZI$$Limit;
+    const uint8_t *_estack = (const uint8_t *)0x20005400;
+#endif
+```
+
+---
+
+## 参数选项
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `-d, --project-dir` | 项目根目录 | 当前目录 |
+| `-o, --output-dir` | CMake 文件输出目录 | cmake/ |
+| `-n, --project-name` | 项目名称 | 自动检测 |
+| `-t, --toolchain` | 默认工具链 (armcc/gcc) | armcc |
+
+---
+
+## 使用示例
 
 ### 基本用法
 
 ```bash
-# 在项目根目录运行
+# 生成并构建（ARMCC）
 python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py
+cd build && cmake .. -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/armcc-toolchain.cmake
+make -j4
 ```
 
-### 指定参数
+### 指定项目名称
 
 ```bash
-# 指定项目目录
-python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py -d /path/to/project
-
-# 指定输出目录
-python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py -o output
-
-# 指定项目名称
 python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py -n MyProject
 ```
 
-## 构建流程
+### 指定输出目录
 
 ```bash
-# 1. 生成 CMake 配置
-python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py
+python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py -o build/cmake
+```
 
-# 2. 创建构建目录并配置
-mkdir build && cd build
-cmake .. -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi-toolchain.cmake
+### 切换到 GCC 工具链
 
-# 3. 编译
+```bash
+python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py --toolchain gcc
+cd build && cmake .. -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/arm-none-eabi-toolchain.cmake
 make -j4
-
-# 4. 输出文件
-# build/Project.elf  - ELF 格式（调试用）
-# build/Project.hex  - Intel HEX 格式（烧录用）
-# build/Project.bin  - 二进制格式（烧录用）
 ```
 
-## 生成的文件结构
+---
+
+## 验证清单
+
+使用 ARMCC CMake 构建前，验证：
+
+- [ ] 工具链路径正确：`armcc.exe` 存在指定位置
+- [ ] CMakeLists.txt 中 `armcc-toolchain.cmake` 路径正确
+- [ ] CMakeLists.txt 中 `SUFFIX ".axf"` 已设置
+- [ ] armcc-toolchain.cmake 中有 `CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY`
+- [ ] sysmem.c 中有 ARMCC/GCC 条件编译
+- [ ] FreeRTOS 使用 RVDS port 而不是 GCC port
+
+---
+
+## 目录结构
 
 ```
-Project/
-├── CMakeLists.txt                    # 主 CMake 配置
-├── cmake/
-│   ├── arm-none-eabi-toolchain.cmake  # 工具链配置
-│   └── project_config.cmake            # 项目配置（源文件和头文件列表）
-└── build/                            # 构建目录（运行 cmake 后创建）
-    ├── CMakeFiles/
-    ├── Project.elf
-    ├── Project.hex
-    └── Project.bin
+.claude-skills/embedded-cmake-generator/
+├── scripts/
+│   └── generate-cmake.py    # 主生成脚本 (支持 --toolchain 参数)
+├── SKILL.md                 # 完整的 Skill 文档
+└── README.md               # 本文件
 ```
 
-## 常见问题
+---
 
-### Q: 如何修改 CPU 配置？
+## 注意事项
 
-编辑 `cmake/arm-none-eabi-toolchain.cmake`，修改 `CPU_FLAGS`：
+1. **工具链路径：** ARMCC 工具链配置需要根据实际安装路径修改 `armcc-toolchain.cmake` 中的路径
+2. **scatter file：** 确保 `MDK-ARM/Project/Project.sct` 文件存在
+3. **sysmem.c：** 需要支持 ARMCC/GCC 条件编译
+4. **FreeRTOS port：** ARMCC 必须使用 RVDS port
 
-```cmake
-# Cortex-M3 (STM32F103)
-set(CPU_FLAGS "-mcpu=cortex-m3 -mthumb -mfloat-abi=soft")
+---
 
-# Cortex-M4 (STM32F407)
-# set(CPU_FLAGS "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16")
-```
+## 相关文档
 
-### Q: 如何添加自定义编译选项？
+- [SKILL.md](SKILL.md) - 完整的 Skill 文档（包含所有问题和解决方案）
+- [stm32-armcc-build](../stm32-armcc-build/README.md) - ARMCC CMake 完整构建指南
+- [embedded-flasher](../embedded-flasher/README.md) - STM32 烧录工具
 
-在 `CMakeLists.txt` 中添加：
+---
 
-```cmake
-add_compile_options(-Dmy_DEFINE)
-add_compile_options(-Wno-error)
-```
+## 更新日志
 
-### Q: 如何排除特定源文件？
-
-编辑 `cmake/project_config.cmake`，从源文件列表中移除不需要的文件。
-
-### Q: 构建失败怎么办？
-
-1. 检查工具链路径是否正确
-2. 清理构建目录：`rm -rf build && mkdir build && cd build`
-3. 查看 SKILL.md 中的"常见问题与解决方案"章节
-
-## 依赖要求
-
-- Python 3.6+
-- CMake 3.20+
-- ARM GCC 工具链（arm-none-eabi-gcc）
-- Make 或 Ninja
+- **v2.0.0 (2026-04-17)**: 添加 ARMCC/GCC 双工具链支持，修复所有已知问题
+- **v1.1.0 (2026-04-17)**: 从 GCC 迁移到 ARMCC
