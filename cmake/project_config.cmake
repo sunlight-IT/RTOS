@@ -1,5 +1,6 @@
 # STM32 项目配置
-# 自动生成于: 2026-04-10 14:33:26
+# 自动生成于: 2026-04-17 15:05:54
+# 工具链: armcc
 
 set(PROJECT_NAME "Project")
 
@@ -100,9 +101,17 @@ set(CPP_SOURCES
 )
 
 # 汇编源文件
-set(ASM_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/startup_stm32f103xb.s
-)
+if(CMAKE_C_COMPILER_ID MATCHES "ARMCC")
+    # ARMCC 使用 arm 子目录的启动文件
+    set(ASM_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/arm/startup_stm32f103xb.s
+    )
+else()
+    # GCC 使用项目根目录的启动文件
+    set(ASM_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/startup_stm32f103xb.s
+    )
+endif()
 
 # 头文件包含目录
 set(INCLUDE_DIRS
@@ -114,7 +123,6 @@ set(INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
     ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
     ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3
     ${CMAKE_CURRENT_SOURCE_DIR}/Usr
     ${CMAKE_CURRENT_SOURCE_DIR}/Usr/app
     ${CMAKE_CURRENT_SOURCE_DIR}/Usr/bsp
@@ -122,4 +130,22 @@ set(INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/Usr/tool
 )
 
-set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/STM32F103XX_FLASH.ld")
+# 根据编译器类型添加 FreeRTOS port 头文件目录
+if(CMAKE_C_COMPILER_ID MATCHES "ARMCC")
+    list(APPEND INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3
+    )
+else()
+    list(APPEND INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3
+    )
+endif()
+
+# 链接脚本
+if(CMAKE_C_COMPILER_ID MATCHES "ARMCC")
+    # ARMCC 使用 scatter file
+    set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/MDK-ARM/Project/Project.sct")
+else()
+    # GCC 使用 linker script
+    set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/STM32F103XX_FLASH.ld")
+endif()
