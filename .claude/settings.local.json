@@ -58,7 +58,12 @@
       "Read(//c/Users/FF/.claude/skills/**)",
       "Bash(dir /s /b \"C:/Users/FF/.claude/skills\")",
       "Bash(dir \"C:\\\\Users\\\\FF\\\\.claude\\\\skills\" /b)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(timeout 3 cat)",
+      "Bash(for driver:*)",
+      "Bash(do echo:*)",
+      "Bash(break)",
+      "Bash(done)"
     ]
   }
 }

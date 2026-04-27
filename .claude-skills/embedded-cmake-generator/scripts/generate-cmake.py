@@ -390,10 +390,11 @@ if(CMAKE_C_COMPILER_ID MATCHES "ARMCC")
         SUFFIX ".axf"
     )
 
-    # 使用 fromelf 生成 bin 文件（注意：fromelf 不支持 --text --data --bss 参数）
+    # 使用 fromelf 生成 bin 和 hex 文件（注意：fromelf 使用 --i32 生成 hex）
     add_custom_command(TARGET ${{PROJECT_NAME}}.elf POST_BUILD
         COMMAND ${{CMAKE_OBJCOPY}} --bin --output ${{CMAKE_BINARY_DIR}}/${{PROJECT_NAME}}.bin ${{CMAKE_BINARY_DIR}}/${{PROJECT_NAME}}.axf
-        COMMENT "Generating .bin file"
+        COMMAND ${{CMAKE_OBJCOPY}} --i32 --output ${{CMAKE_BINARY_DIR}}/${{PROJECT_NAME}}.hex ${{CMAKE_BINARY_DIR}}/${{PROJECT_NAME}}.axf
+        COMMENT "Generating .bin and .hex files"
     )
 else()
     # GCC 工具链
