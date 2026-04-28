@@ -61,7 +61,7 @@ STM32 固件烧录脚本
 示例:
     $0                           # 默认模式：烧录+验证+复位
     $0 --mode flash            # 仅烧录
-    $0 --debugger jlink        # 使用 J-Link
+    $0 --debugger cmsis-dap   # 使用 CMSIS-DAP
     $0 --build-only             # 只构建不烧录
 
 EOF
@@ -69,9 +69,13 @@ EOF
 
 # 解析参数
 while [[ $# -gt 0 ]]; do
-    case $1 in
+    case "$1" in
         -d|--debugger)
             DEBUGGER="$2"
+            shift 2
+            ;;
+        --debugger=*)  # 支持长格式 --debugger=VALUE
+            DEBUGGER="${1#*=}"
             shift
             ;;
         -t|--target)

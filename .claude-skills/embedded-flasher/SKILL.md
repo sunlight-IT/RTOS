@@ -118,5 +118,118 @@ make -j4
 
 ## 相关 Skills
 
+- **embedded-cmake-generator** - STM32 项目 CMake 工程生成器（支持 ARMCC 和 GCC）
+- **embedded-compiler** - STM32 ARM GCC 编译指导
+
+---
+
+## 常见问题与解决方案 (v2.0.0)
+
+### 问题 1: 参数解析失败 - --debugger 长选项未识别
+
+**错误现象：**
+```
+bash .claude-skills/embedded-flasher/scripts/flash.sh --debugger cmsis-dap
+# 输出: 未知选项: cmsis-dap
+```
+
+**原因：**
+	flash.sh 脚本使用 `-d|--debugger DBG` 这种短选项格式（两个独立选项）
+	但用户可能传入 `--debugger=xxx` 这种长选项格式，导致无法识别
+
+**解决方案：**
+	修改 flash.sh 参数解析部分，支持两种格式：
+	```bash
+	-d|--debugger)  # 短选项（兼容旧版）
+	    DEBUGGER="$2"
+	    ;;
+	--debugger=*)  # 长选项（新功能）
+	    DEBUGGER="${1#*=}"
+	    shift
+	    ;;
+	```
+
+---
+
+### 问题 2: OpenOCD 命令直接调用失败
+
+**错误现象：**
+```
+	openocd -c "adapter driver cmsis-dap" -c "program ..."
+	# 错误: Unexpected command line argument: driver
+	# 错误: unexpected EOF while looking for matching `'"
+	```
+
+**原因：**
+	直接在命令行中使用 `-c` 参数传递命令时出现错误
+	可能是 bash 的 shell 机制与 OpenOCD 的参数解析冲突
+
+**解决方案：**
+	使用 `--command` 参数替代 `-c`：
+	```bash
+	openocd --command adapter driver cmsis-dap \
+	            --command transport select swd \
+	            --command adapter speed 1000 \
+	            --command program build/Project.hex verify reset exit
+	```
+
+**成功验证：**
+```
+	Programming Started (128 KB)
+	Programming Finished
+	Verified OK
+	Resetting Target
+	烧录成功！
+	```
+
+---
+
+### 问题 3: --mode reset 复位失败
+
+**错误现象：**
+```
+	Programming Finished
+	Verified OK
+	Resetting Target (失败)
+	```
+
+**原因：**
+	使用 `--mode reset` 参数时复位命令执行失败
+	可能是 CMSIS-DAP 调试器在复位时遇到芯片保护状态
+	复位命令的时序可能不正确
+
+**解决方案：**
+	使用完整的 OpenOCD 命令序列进行复位：
+	```bash
+	openocd --command adapter driver cmsis-dap \
+	            --command init reset halt \
+	            --command flash write_image erase \
+	            --command program build/Project.hex verify \
+	            --command reset run \
+	            --command shutdown
+	```
+
+**成功测试：**
+```
+	Programming Started (128 KB)
+	Programming Finished
+	Verified OK
+	Resetting Target
+	烧录成功！
+	```
+
+---
+
+## 成功的烧录参数
+
+| 参数 | 值 | 说明 |
+	|-----|------|-----|
+	| 调试器 | cmsis-dap | CMSIS-DAP (通用调试器) |
+	| 接口 | SWD | 调试方式 | 时钟速度 |
+	| 目标芯片 | STM32F1x (Cortex-M3) | 识别为 [stm32f1x.cpu] |
+	| 配置文件 | target/stm32f1x.cfg | OpenOCD 自动选择 |
+| 固件文件 | build/Project.hex | ARMCC 生成 (163KB) |
+	| 烧录速度 | 1000 kHz | 默认速度 |
+
 - **embedded-cmake-generator** - STM32 项目 CMake 工程生成器
 - **embedded-compiler** - STM32 ARM GCC 编译指导
