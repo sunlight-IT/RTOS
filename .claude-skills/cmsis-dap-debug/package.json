@@ -1,0 +1,23 @@
+{
+  "name": "cmsis-dap-debug",
+  "version": "1.0.0",
+  "description": "STM32F103C8T6 CMSIS-DAP 调试技能，使用 OpenOCD 进行内存、寄存器和执行控制",
+  "main": "scripts/debug.py",
+  "keywords": [
+    "embedded",
+    "stm32",
+    "debug",
+    "openocd",
+    "cmsis-dap",
+    "gdb"
+  ],
+  "scripts": {
+    "start": "python scripts/debug.py --help",
+    "test": "python scripts/debug.py --show-registers"
+  },
+  "dependencies": {
+    "openocd": ">=0.10.0"
+  },
+  "author": "Claude Code",
+  "license": "MIT"
+}

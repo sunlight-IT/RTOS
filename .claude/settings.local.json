@@ -71,7 +71,9 @@
       "Bash(bash .claude-skills/embedded-flasher/scripts/flash.sh -m flash)",
       "Bash(bash flash_test.sh)",
       "Bash(find D:/WorkSpace/Other_Project/STM32F103C8T6/Project/.claude/ -maxdepth 2 -name *.md -type f)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(tasklist)",
+      "Bash(taskkill:*)"
     ]
   }
 }

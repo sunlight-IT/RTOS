@@ -10,7 +10,7 @@
             "request": "launch",
             "servertype": "openocd",
             "cwd": "${workspaceFolder}",
-            "executable": "build/Project.elf", // 修改为你的 elf 文件路径
+            "executable": "build/Project.axf", // 修改为你的 elf 文件路径
             "configFiles": [
                 "interface/cmsis-dap.cfg", // 告诉 OpenOCD 使用 CMSIS-DAP 调试器
                 "target/stm32f1x.cfg" // 修改为你实际使用的单片机系列配置文件
