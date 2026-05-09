@@ -1,6 +1,6 @@
 {
   "name": "embedded-cmake-generator",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "STM32项目CMake工程自动生成器，自动扫描项目并生成完整的CMake构建系统",
   "main": "SKILL.md",
   "readme": "README.md",

@@ -1,0 +1,65 @@
+{
+  "name": "GCC",
+  "toolchain_id": "gcc",
+  "cmake_compiler_id": "GNU",
+  "compiler_method": "prefix",
+  "compiler_prefix": "arm-none-eabi-",
+  "tools": {
+    "CMAKE_C_COMPILER": "{prefix}gcc",
+    "CMAKE_CXX_COMPILER": "{prefix}g++",
+    "CMAKE_ASM_COMPILER": "{prefix}gcc",
+    "CMAKE_OBJCOPY": "{prefix}objcopy",
+    "CMAKE_OBJDUMP": "{prefix}objdump",
+    "CMAKE_SIZE": "{prefix}size"
+  },
+  "executable_suffix": ".elf",
+  "try_compile_target_type": "STATIC_LIBRARY",
+  "cpu_flags": {
+    "Cortex-M0": "-mcpu=cortex-m0 -mthumb",
+    "Cortex-M0+": "-mcpu=cortex-m0plus -mthumb",
+    "Cortex-M3": "-mcpu=cortex-m3 -mthumb",
+    "Cortex-M4": "-mcpu=cortex-m4 -mthumb",
+    "Cortex-M7": "-mcpu=cortex-m7 -mthumb",
+    "Cortex-M23": "-mcpu=cortex-m23 -mthumb",
+    "Cortex-M33": "-mcpu=cortex-m33 -mthumb",
+    "Cortex-M55": "-mcpu=cortex-m55 -mthumb",
+    "Cortex-M85": "-mcpu=cortex-m85 -mthumb"
+  },
+  "fpu_flags": {
+    "none": "-mfloat-abi=soft",
+    "softvfp": "-mfloat-abi=softfp",
+    "fpv4-sp-d16": "-mfloat-abi=hard -mfpu=fpv4-sp-d16",
+    "fpv5-sp-d16": "-mfloat-abi=hard -mfpu=fpv5-sp-d16",
+    "fpv5-d16": "-mfloat-abi=hard -mfpu=fpv5-d16"
+  },
+  "flags": {
+    "c_common": ["-Wall", "-Wextra", "-g", "-fdata-sections", "-ffunction-sections"],
+    "c_debug": ["-O0"],
+    "c_release": ["-O2"],
+    "cxx_common": ["-Wall", "-Wextra", "-g", "-fdata-sections", "-ffunction-sections"],
+    "cxx_debug": ["-O0"],
+    "cxx_release": ["-O2"],
+    "asm_common": ["-x", "assembler-with-cpp"],
+    "linker_common": ["-specs=nano.specs", "-Wl,--gc-sections"],
+    "linker_debug": []
+  },
+  "link_libraries": ["c", "m", "nosys"],
+  "linker_script_option_template": "-T{path}",
+  "post_build": {
+    "hex": {
+      "command": ["{CMAKE_OBJCOPY}", "-O", "ihex", "{target_file}", "{output_dir}/{project_name}.hex"],
+      "comment": "Generating .hex file"
+    },
+    "bin": {
+      "command": ["{CMAKE_OBJCOPY}", "-O", "binary", "{target_file}", "{output_dir}/{project_name}.bin"],
+      "comment": "Generating .bin file"
+    },
+    "size": {
+      "command": ["{CMAKE_SIZE}", "{target_file}"],
+      "comment": "Size report"
+    }
+  },
+  "target_properties": {
+    "RUNTIME_OUTPUT_DIRECTORY": "${CMAKE_BINARY_DIR}"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "family": "STM32F1",
+  "vendor": "STMicroelectronics",
+  "cpu": {
+    "core": "Cortex-M3",
+    "fpu": "none",
+    "endian": "little"
+  },
+  "models": {
+    "STM32F103C8Tx": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "64K" },
+        { "name": "RAM",   "origin": "0x20000000", "length": "20K" }
+      ],
+      "defines": ["STM32F103xB"],
+      "max_clock_hz": 72000000
+    },
+    "STM32F103RBTx": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "128K" },
+        { "name": "RAM",   "origin": "0x20000000", "length": "20K" }
+      ],
+      "defines": ["STM32F103xB"],
+      "max_clock_hz": 72000000
+    }
+  },
+  "default_defines": ["USE_HAL_DRIVER"],
+  "header_paths": {
+    "cmsis_device": "Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+    "hal_driver": "Drivers/STM32F1xx_HAL_Driver/Inc"
+  },
+  "startup": {
+    "pattern": "startup_stm32f103x?.s",
+    "gcc_default": "startup_stm32f103xb.s",
+    "armcc_pattern": "Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/arm/startup_stm32f103*.s",
+    "armcc_default": "Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/arm/startup_stm32f103xb.s"
+  },
+  "linker": {
+    "gcc_pattern": "*FLASH*.ld",
+    "armcc_pattern": "*.sct"
+  },
+  "hal_driver_name": "STM32F1xx_HAL_Driver"
+}

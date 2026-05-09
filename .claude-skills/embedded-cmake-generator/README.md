@@ -1,32 +1,38 @@
 # Embedded CMake Generator
 
-STM32 项目 CMake 构建系统自动生成器，支持 **ARMCC (Keil MDK 5.4)** 和 **GCC** 双工具链。
+> **v3.0.0** — Universal embedded CMake build system generator with config-driven architecture, multi-chip support, and auto-detection.
+
+跨芯片、跨工具链的通用嵌入式 CMake 构建系统生成器。支持 **ARMCC (Keil MDK)**、**GCC (arm-none-eabi)**，自动检测 STM32F1/F4/F7/G0/H7 等芯片系列，通过 JSON 配置文件或自动检测实现零配置使用。
 
 ## 功能特性
 
-- ✅ **自动扫描**：递归扫描项目目录，收集所有源文件和头文件路径
-- ✅ **智能排除**：自动排除不需要的文件和目录
-- ✅ **双工具链支持**：自动生成 ARMCC 和 GCC 工具链配置
-- ✅ **自动选择 Port**：根据工具链自动选择 FreeRTOS port (RVDS vs GCC)
-- ✅ **自动选择启动文件**：ARMCC 使用 arm 子目录，GCC 使用根目录
-- ✅ **条件处理**：CMakeLists.txt 自动处理工具链差异
+- **自动检测**：零配置自动识别 CubeMX 项目、芯片型号、RTOS 类型、工具链
+- **配置驱动**：通过 `embedded-cmake.json` 配置项目，支持所有参数定制
+- **双工具链**：ARMCC（Keil MDK 5.4）和 GCC（arm-none-eabi）双支持
+- **芯片数据库**：JSON 格式芯片定义，按需扩展（STM32F1 已内置）
+- **工具链数据库**：JSON 格式工具链配置，CPU/FPU 标志自动解析
+- **智能扫描**：可配置源文件/头文件扫描规则，自动排除模板和不需要的文件
+- **向后兼容**：v2.x CLI 接口完全保留，无配置迁移
 
 ---
 
 ## 快速开始
 
 ```bash
-# 生成 CMake 工程（ARMCC 默认）
+# 零配置使用（自动检测项目）
 python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py
 
-# 指定工具链
-python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py --toolchain armcc  # ARMCC
-python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py --toolchain gcc   # GCC
+# 指定芯片
+python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py --chip-family STM32F1
 
-# 构建项目（ARMCC）
-mkdir -p build && cd build
-cmake .. -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=../cmake/armcc-toolchain.cmake
-make -j4
+# 指定工具链
+python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py --toolchain gcc
+
+# 预览（不生成文件）
+python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py --dry-run
+
+# 生成配置模板
+python .claude-skills/embedded-cmake-generator/scripts/generate-cmake.py --init
 ```
 
 ---

@@ -73,7 +73,9 @@
       "Bash(find D:/WorkSpace/Other_Project/STM32F103C8T6/Project/.claude/ -maxdepth 2 -name *.md -type f)",
       "WebSearch",
       "Bash(tasklist)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(rm -rf build2)",
+      "Bash(mkdir build2:*)"
     ]
   }
 }

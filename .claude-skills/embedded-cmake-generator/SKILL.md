@@ -1,25 +1,31 @@
 ---
 name: embedded-cmake-generator
-description: STM32项目CMake工程自动生成器
-version: 2.0.0
-tags: [embedded, stm32, cmake, build-system, cmake-generator, armcc, gcc]
-
+description: 通用嵌入式项目CMake工程自动生成器 (配置驱动, 多芯片, 多工具链)
+version: 3.0.0
+tags: [embedded, stm32, cmake, build-system, cmake-generator, armcc, gcc, universal]
 ---
 
-# Embedded CMake Generator Skill
+# Embedded CMake Generator Skill (v3.0)
 
-自动为STM32嵌入式项目生成完整的CMake构建系统，通过扫描项目目录自动收集源文件和头文件路径。
+通用嵌入式 CMake 构建系统生成器。通过自动检测或 JSON 配置文件描述项目，自动生成完整的 CMake 构建系统。
 
-**本版本支持 ARMCC (Keil MDK 5.4) 和 GCC 双工具链。**
+**v3.0 新特性：**
+- 配置驱动架构（`embedded-cmake.json`）
+- 芯片数据库（JSON，按需扩展）
+- 工具链数据库（CPU/FPU 标志自动解析）
+- 多芯片/多项目自动检测
+- 零配置使用 + 全参数可定制
+
+支持 **ARMCC (Keil MDK)** 和 **GCC (arm-none-eabi)** 双工具链，内置 STM32F1 芯片定义。
 
 ## When to Use
 
 使用此 skill 当你需要：
 
-- 将现有STM32项目迁移到 ARMCC/GCC CMake构建系统
-- 从头创建新的STM32 CMake工程
-- 自动维护项目中的源文件列表
-- 在CI/CD中使用CMake构建STM32项目
+- 为嵌入式项目生成 CMake 构建系统（STM32、GD32、NXP 等）
+- 自动检测项目配置（芯片型号、RTOS、工具链）
+- 定制项目扫描规则、编译器标志、输出格式
+- 在 CI/CD 中使用 CMake 构建嵌入式项目
 
 ## 快速开始
 

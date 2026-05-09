@@ -1,0 +1,68 @@
+{
+  "name": "ARMCC",
+  "toolchain_id": "armcc",
+  "cmake_compiler_id": "ARMCC",
+  "compiler_method": "absolute_path",
+  "compiler_prefix": "",
+  "tools": {
+    "CMAKE_C_COMPILER": "{compiler_dir}/armcc.exe",
+    "CMAKE_CXX_COMPILER": "{compiler_dir}/armcc.exe",
+    "CMAKE_ASM_COMPILER": "{compiler_dir}/armasm.exe",
+    "CMAKE_OBJCOPY": "{compiler_dir}/fromelf.exe",
+    "CMAKE_SIZE": "{compiler_dir}/fromelf.exe",
+    "CMAKE_LINKER": "{compiler_dir}/armlink.exe"
+  },
+  "executable_suffix": ".axf",
+  "try_compile_target_type": "STATIC_LIBRARY",
+  "cpu_flags": {
+    "Cortex-M0": "--cpu=Cortex-M0",
+    "Cortex-M0+": "--cpu=Cortex-M0+",
+    "Cortex-M3": "--cpu=Cortex-M3",
+    "Cortex-M4": "--cpu=Cortex-M4",
+    "Cortex-M7": "--cpu=Cortex-M7",
+    "Cortex-M23": "--cpu=Cortex-M23",
+    "Cortex-M33": "--cpu=Cortex-M33"
+  },
+  "fpu_flags": {
+    "none": "",
+    "softvfp": "--fpu=SoftVFP",
+    "fpv4-sp-d16": "--fpu=FPv4_SP",
+    "fpv5-sp-d16": "--fpu=FPv5_SP"
+  },
+  "flags": {
+    "c_common": ["--c99"],
+    "c_debug": ["-Otime", "-g"],
+    "c_release": ["-Otime", "--g"],
+    "cxx_common": ["--cpp", "--no_exceptions"],
+    "cxx_debug": ["-Otime", "-g"],
+    "cxx_release": ["-Otime", "--g"],
+    "asm_common": [],
+    "linker_common": [
+      "--entry", "Reset_Handler",
+      "--list", "{output_dir}/{project_name}.map",
+      "--map", "--xref",
+      "--callgraph", "--symbols",
+      "--info", "sizes",
+      "--info", "totals",
+      "--info", "unused",
+      "--info", "veneers"
+    ],
+    "linker_debug": ["--debug"]
+  },
+  "link_libraries": [],
+  "linker_script_option_template": "--scatter {path}",
+  "post_build": {
+    "bin": {
+      "command": ["{CMAKE_OBJCOPY}", "--bin", "--output", "{output_dir}/{project_name}.bin", "{target_file}"],
+      "comment": "Generating .bin file"
+    },
+    "hex": {
+      "command": ["{CMAKE_OBJCOPY}", "--i32", "--output", "{output_dir}/{project_name}.hex", "{target_file}"],
+      "comment": "Generating .hex file"
+    }
+  },
+  "target_properties": {
+    "RUNTIME_OUTPUT_DIRECTORY": "${CMAKE_BINARY_DIR}",
+    "SUFFIX": ".axf"
+  }
+}

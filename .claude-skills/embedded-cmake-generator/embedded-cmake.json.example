@@ -1,0 +1,77 @@
+{
+  // embedded-cmake.json - Project configuration for Embedded CMake Generator v3.0
+  // All fields are optional. Omitted fields will be auto-detected.
+
+  "project": {
+    // Project name (default: auto-detected from .ioc / Makefile / CMakeLists.txt / dirname)
+    "name": "MySTM32Project"
+  },
+
+  "chip": {
+    // Chip family (e.g. STM32F1, STM32F4, STM32G0)
+    "family": "STM32F1",
+    // Exact chip model (e.g. STM32F103C8Tx, STM32F407VGTx)
+    "model": "STM32F103C8Tx"
+  },
+
+  "scan": {
+    // Source file extensions to include
+    "source_extensions": [".c", ".cpp", ".cxx", ".cc", ".s", ".S"],
+    // Header file extensions to include
+    "header_extensions": [".h", ".hpp"],
+    // Directory names to exclude from scanning
+    "exclude_dirs": ["build", ".git", ".vscode", "MDK-ARM", "EWARM", "Templates", "Examples"],
+    // Directory name patterns to exclude (supports * and ?)
+    "exclude_dir_patterns": ["build*"],
+    // Specific files to exclude by name
+    "exclude_files": ["heap_1.c", "heap_2.c", "heap_3.c", "heap_5.c", "cmsis_os.c"],
+    // File name patterns to exclude
+    "exclude_file_patterns": ["*template*"],
+    // Extra header directories to exclude
+    "extra_exclude_header_dirs": []
+  },
+
+  // Preprocessor defines
+  "defines": ["USE_HAL_DRIVER"],
+
+  // Toolchains to generate configs for
+  "toolchains": ["gcc", "armcc"],
+
+  // ARMCC specific configuration
+  "armcc": {
+    // Path to ARMCC binary directory
+    "compiler_dir": "D:/APP/Keil/Keil5MDK5.4/ARM/ARMCC/bin"
+  },
+
+  // RTOS configuration
+  "rtos": {
+    // RTOS type: "none", "FreeRTOS", "ThreadX", "RTThread"
+    "type": "FreeRTOS",
+    // Heap implementation file
+    "heap": "heap_4.c",
+    // CMSIS-RTOS version: "V1", "V2", or ""
+    "cmsis_version": "V2"
+  },
+
+  // Startup file (GCC) - auto-detected if omitted
+  "startup_file": "startup_stm32f103xb.s",
+  // Startup file (ARMCC) - auto-detected if omitted
+  "armcc_startup_file": "Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/arm/startup_stm32f103xb.s",
+
+  // Linker script (GCC) - auto-detected if omitted
+  "linker_script": "STM32F103XX_FLASH.ld",
+  // Scatter file (ARMCC) - auto-detected if omitted
+  "armcc_scatter_file": "MDK-ARM/Project/Project.sct",
+
+  // Output configuration
+  "output": {
+    // CMake files output directory
+    "cmake_dir": "cmake",
+    // Generate .hex file
+    "hex": true,
+    // Generate .bin file
+    "bin": true,
+    // Print size report
+    "size": true
+  }
+}
