@@ -1,0 +1,51 @@
+{
+  "family": "STM32G0",
+  "vendor": "STMicroelectronics",
+  "cpu": {
+    "core": "Cortex-M0+",
+    "fpu": "none",
+    "endian": "little"
+  },
+  "models": {
+    "STM32G071RBTx": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "128K" },
+        { "name": "RAM", "origin": "0x20000000", "length": "36K" }
+      ],
+      "defines": ["STM32G071xx"],
+      "max_clock_hz": 64000000
+    },
+    "STM32G0B1RETx": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "512K" },
+        { "name": "RAM", "origin": "0x20000000", "length": "144K" }
+      ],
+      "defines": ["STM32G0B1xx"],
+      "max_clock_hz": 64000000
+    },
+    "STM32G031K8Ux": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "64K" },
+        { "name": "RAM", "origin": "0x20000000", "length": "8K" }
+      ],
+      "defines": ["STM32G031xx"],
+      "max_clock_hz": 64000000
+    }
+  },
+  "default_defines": ["USE_HAL_DRIVER"],
+  "header_paths": {},
+  "startup": {
+    "pattern": "startup_stm32g0*.s",
+    "gcc_default": "startup_stm32g0b1xx.s",
+    "armcc_pattern": "startup_stm32g0*.s",
+    "armcc_default": "startup_stm32g0xx.s"
+  },
+  "linker": {
+    "gcc_pattern": "*FLASH*.ld",
+    "armcc_pattern": "*.sct"
+  },
+  "hal_driver_name": "STM32G0xx_HAL_Driver",
+  "ext": {
+    "note": "STM32G0 family - Cortex-M0+, entry-level. G0B1 has more RAM."
+  }
+}

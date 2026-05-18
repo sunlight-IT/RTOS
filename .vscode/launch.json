@@ -15,6 +15,9 @@
                 "interface/cmsis-dap.cfg", // 告诉 OpenOCD 使用 CMSIS-DAP 调试器
                 "target/stm32f1x.cfg" // 修改为你实际使用的单片机系列配置文件
             ],
+            "loadFiles": [
+                "${workspaceFolder}/build/Project.hex"
+            ],
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none",
             "svdFile": "${workspaceFolder}/STM32F103.svd" // 可选

@@ -6,12 +6,13 @@ family name, model name, or preprocessor define.
 
 from __future__ import annotations
 
-import json
 import os
+import re
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from .models import ChipInfo, ChipModel, CpuInfo, MemoryRegion, StartFileInfo, LinkerFileInfo
+from .json_registry import JsonRegistry
+from .models import ChipInfo, ChipModel, CpuInfo, LinkerFileInfo, MemoryRegion, StartFileInfo
 
 
 def _default_data_dir() -> Path:
@@ -71,75 +72,76 @@ def _parse_chip_json(data: dict) -> ChipInfo:
     )
 
 
-class ChipDB:
+def resolve_chip_model(chip_info: ChipInfo, model_name: str) -> Optional[ChipModel]:
+    """Resolve chip model with fuzzy matching.
+
+    Handles naming variations:
+    - CubeMX:  STM32F103C8T6 -> STM32F103C8Tx
+    - Keil:    STM32F103C8   -> STM32F103C8Tx (bare device, no package suffix)
+    """
+    # Exact match
+    model = chip_info.get_model(model_name)
+    if model:
+        return model
+
+    # Fuzzy #1: normalize CubeMX suffix (e.g. C8T6 -> C8Tx, ZIT6 -> ZITx)
+    normalized = re.sub(r'[A-Z]\d$', 'Tx', model_name)
+    if normalized != model_name:
+        model = chip_info.get_model(normalized)
+        if model:
+            return model
+
+    # Fuzzy #2: append Tx suffix for bare Keil device names
+    if not re.search(r'[A-Z]\d$', model_name[-3:]):
+        for suffix in ['Tx', 'Vx', 'Rx', 'Cx', 'Zx']:
+            candidate = model_name + suffix
+            model = chip_info.get_model(candidate)
+            if model:
+                return model
+
+    return None
+
+
+class ChipDB(JsonRegistry[ChipInfo]):
     """Database of chip family definitions loaded from JSON files.
 
     Usage::
 
         db = ChipDB()
+        db.add_search_path(Path("path/to/chips"))
         db.load_builtin()
         info = db.find_family("STM32F1")
         model = db.find_model("STM32F103C8Tx")
-        model2 = db.find_by_define("STM32F103xB")
     """
 
     def __init__(self, search_paths: Optional[List[Path]] = None):
-        self._families: Dict[str, ChipInfo] = {}  # family name -> ChipInfo
+        super().__init__(search_paths)
         self._model_index: Dict[str, str] = {}     # model name -> family name
         self._define_index: Dict[str, str] = {}    # define -> family name
-        self._search_paths: List[Path] = list(search_paths or [])
 
-    def add_search_path(self, path: Path) -> None:
-        """Add a search path for JSON chip files."""
-        if path not in self._search_paths:
-            self._search_paths.append(path)
+    # -- JsonRegistry hooks -----------------------------------------------
+
+    def _parse_item(self, data: dict) -> ChipInfo:
+        return _parse_chip_json(data)
+
+    def _register_item(self, item: ChipInfo) -> None:
+        self._items[item.family] = item
+        for model_name in item.models:
+            self._model_index[model_name] = item.family
+            for define in item.models[model_name].defines:
+                self._define_index[define] = item.family
 
     def load_builtin(self) -> int:
-        """Load all built-in chip definitions. Returns count of files loaded."""
-        self._search_paths.append(_default_data_dir())
+        """Load built-in chip definitions."""
+        self.add_search_path(_default_data_dir())
         return self._load_from_paths()
 
-    def load_path(self, path: Path) -> int:
-        """Load chip JSON files from a specific directory. Returns count loaded."""
-        count = 0
-        if path.is_dir():
-            for f in sorted(path.glob("*.json")):
-                self._load_file(f)
-                count += 1
-        return count
-
-    def _load_from_paths(self) -> int:
-        """Load from all registered search paths."""
-        count = 0
-        for path in self._search_paths:
-            count += self.load_path(path)
-        return count
-
-    def _load_file(self, filepath: Path) -> Optional[ChipInfo]:
-        """Load a single chip JSON file."""
-        try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            chip = _parse_chip_json(data)
-            self.register(chip)
-            return chip
-        except (json.JSONDecodeError, KeyError, TypeError) as e:
-            import sys
-            print(f"[WARN] Failed to load chip file {filepath}: {e}", file=sys.stderr)
-            return None
-
-    def register(self, chip: ChipInfo) -> None:
-        """Register a ChipInfo (from JSON or programmatic creation)."""
-        self._families[chip.family] = chip
-        for model_name in chip.models:
-            self._model_index[model_name] = chip.family
-            for define in chip.models[model_name].defines:
-                self._define_index[define] = chip.family
+    # -- lookup API -------------------------------------------------------
 
     def find_family(self, family: str) -> Optional[ChipInfo]:
         """Look up a chip family by name (case-insensitive)."""
         family_upper = family.upper()
-        for name, info in self._families.items():
+        for name, info in self._items.items():
             if name.upper() == family_upper:
                 return info
         return None
@@ -148,7 +150,7 @@ class ChipDB:
         """Look up a specific chip model by name."""
         family_name = self._model_index.get(model)
         if family_name:
-            family = self._families.get(family_name)
+            family = self._items.get(family_name)
             if family:
                 return family.get_model(model)
         return None
@@ -161,33 +163,22 @@ class ChipDB:
         # Exact match first
         family_name = self._model_index.get(model)
         if family_name:
-            return self._families.get(family_name)
+            return self._items.get(family_name)
 
-        # Fuzzy match: normalize number suffixes (e.g. C8T6 -> C8Tx)
-        return self._fuzzy_match_model(model)
-
-    def _fuzzy_match_model(self, model: str) -> Optional[ChipInfo]:
-        """Try fuzzy matching for chip model names.
-
-        Handles CubeMX naming differences like:
-        - STM32F103C8T6 vs STM32F103C8Tx (pin count + package suffix)
-        """
-        import re
-        # Normalize: strip trailing package info after the density code
-        # e.g. STM32F103C8T6 -> base STM32F103C8
-        # Actually, match by dropping last chars and replacing with wildcard
+        # Fuzzy match
         normalized = re.sub(r'(\d)[A-Z]\d$', r'\1Tx', model)
         if normalized != model:
             family_name = self._model_index.get(normalized)
             if family_name:
-                return self._families.get(family_name)
+                return self._items.get(family_name)
+
         return None
 
     def find_by_define(self, define: str) -> Optional[ChipModel]:
         """Find a chip model by its preprocessor define (e.g. 'STM32F103xB')."""
         family_name = self._define_index.get(define)
         if family_name:
-            family = self._families.get(family_name)
+            family = self._items.get(family_name)
             if family:
                 return family.find_model_by_define(define)
         return None
@@ -196,12 +187,8 @@ class ChipDB:
         """Find a chip family by a preprocessor define."""
         family_name = self._define_index.get(define)
         if family_name:
-            return self._families.get(family_name)
+            return self._items.get(family_name)
         return None
-
-    def list_families(self) -> List[str]:
-        """List all registered family names."""
-        return sorted(self._families.keys())
 
     def list_models(self, family: Optional[str] = None) -> List[str]:
         """List all models, optionally filtered by family."""
@@ -209,9 +196,3 @@ class ChipDB:
             info = self.find_family(family)
             return sorted(info.models.keys()) if info else []
         return sorted(self._model_index.keys())
-
-    def __len__(self) -> int:
-        return len(self._families)
-
-    def __contains__(self, family: str) -> bool:
-        return self.find_family(family) is not None

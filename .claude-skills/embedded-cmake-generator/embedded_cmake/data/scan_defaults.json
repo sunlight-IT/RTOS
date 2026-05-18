@@ -1,0 +1,28 @@
+{
+  "exclude_dirs": [
+    "Debug", "Release",
+    ".git", ".vscode", ".idea", ".settings",
+    "__pycache__", ".pytest_cache", ".mypy_cache",
+    "MDK-ARM", "EWARM",
+    "Template", "Templates", "Examples",
+    "Core_A", "DSP", "DSP_Lib_TestSuite", "NN", "RTOS2",
+    "RVDS"
+  ],
+  "exclude_files": [
+    "syscalls.c",
+    "SEGGER_RTT_ASM_ARMv7M.S"
+  ],
+  "exclude_file_patterns": ["*template*", "*Template*", "*si4project*"],
+  "extension_categories": {
+    "asm": [".s", ".S", ".asm"],
+    "cpp": [".cpp", ".cxx", ".cc"],
+    "lib": [".lib"],
+    "static_lib": [".a"]
+  },
+  "config_h_priority_indicators": ["Main", "main", "App", "Inc"],
+
+  "chip_family_filtering": {
+    "enabled": true,
+    "search_paths": ["Hardware", "Bsp"]
+  }
+}

@@ -1,18 +1,21 @@
 # Embedded CMake Generator
 
-> **v3.0.0** — Universal embedded CMake build system generator with config-driven architecture, multi-chip support, and auto-detection.
+> **v4.0.0** — Universal embedded CMake build system generator with Keil/CubeMX parsing, multi-chip, multi-RTOS, and auto-detection.
 
-跨芯片、跨工具链的通用嵌入式 CMake 构建系统生成器。支持 **ARMCC (Keil MDK)**、**GCC (arm-none-eabi)**，自动检测 STM32F1/F4/F7/G0/H7 等芯片系列，通过 JSON 配置文件或自动检测实现零配置使用。
+跨芯片、跨工具链的通用嵌入式 CMake 构建系统生成器。支持 **ARMCC (Keil MDK)**、**GCC (arm-none-eabi)**，支持 **Keil .uvprojx** 和 **CubeMX .ioc** 项目解析，内置 APM32/STM32F1/STM32L1/NXP 芯片定义。
 
 ## 功能特性
 
-- **自动检测**：零配置自动识别 CubeMX 项目、芯片型号、RTOS 类型、工具链
+- **Keil 项目解析**：自动解析 .uvprojx，提取宏定义、include 路径、源文件、散列文件、.lib 库
+- **CubeMX 支持**：自动识别 .ioc 文件，提取芯片型号和 RTOS 配置
+- **自动检测**：零配置自动识别 Keil/CubeMX 项目、芯片型号、RTOS (FreeRTOS/uCOS-II)、工具链
 - **配置驱动**：通过 `embedded-cmake.json` 配置项目，支持所有参数定制
 - **双工具链**：ARMCC（Keil MDK 5.4）和 GCC（arm-none-eabi）双支持
-- **芯片数据库**：JSON 格式芯片定义，按需扩展（STM32F1 已内置）
+- **芯片数据库**：JSON 格式芯片定义，按需扩展（APM32E1/STM32F1/STM32L1/MK64 已内置）
 - **工具链数据库**：JSON 格式工具链配置，CPU/FPU 标志自动解析
+- **单片化 include 检测**：自动识别 `#include "*.c"` 模式，排除重复编译
 - **智能扫描**：可配置源文件/头文件扫描规则，自动排除模板和不需要的文件
-- **向后兼容**：v2.x CLI 接口完全保留，无配置迁移
+- **向后兼容**：v3.x CLI 接口完全保留，无配置迁移
 
 ---
 
@@ -288,5 +291,7 @@ make -j4
 
 ## 更新日志
 
+- **v4.0.0 (2026-05-09)**: Keil .uvprojx 解析器、uCOS-II 支持、芯片数据库扩展 (APM32E1/STM32L1/MK64)、单片化 include 检测、config.h 冲突检测、.lib 库支持、CLI 扩展 (--keil-project/--board/--cpu)
+- **v3.0.0 (2026-04-17)**: 配置驱动架构、芯片/工具链数据库、多芯片自动检测
 - **v2.0.0 (2026-04-17)**: 添加 ARMCC/GCC 双工具链支持，修复所有已知问题
 - **v1.1.0 (2026-04-17)**: 从 GCC 迁移到 ARMCC

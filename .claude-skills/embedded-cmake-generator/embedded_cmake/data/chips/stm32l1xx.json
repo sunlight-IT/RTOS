@@ -1,0 +1,35 @@
+{
+  "family": "STM32L1",
+  "vendor": "STMicroelectronics",
+  "cpu": {
+    "core": "Cortex-M3",
+    "fpu": "none",
+    "endian": "little"
+  },
+  "models": {
+    "STM32L151CBTx": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "128K" },
+        { "name": "RAM", "origin": "0x20000000", "length": "16K" },
+        { "name": "EEPROM", "origin": "0x08080000", "length": "4K" }
+      ],
+      "defines": ["STM32L151xB"],
+      "max_clock_hz": 32000000
+    }
+  },
+  "default_defines": ["USE_HAL_DRIVER"],
+  "header_paths": {
+    "cmsis_device": "Drivers/CMSIS/Device/ST/STM32L1xx/Include",
+    "hal_driver": "Drivers/STM32L1xx_HAL_Driver/Inc"
+  },
+  "startup": {
+    "pattern": "startup_stm32l1*.s",
+    "gcc_default": "startup_stm32l151xb.s",
+    "armcc_pattern": "Drivers/CMSIS/Device/ST/STM32L1xx/Source/Templates/arm/startup_stm32l1*.s"
+  },
+  "linker": {
+    "gcc_pattern": "*FLASH*.ld",
+    "armcc_pattern": "*.sct"
+  },
+  "hal_driver_name": "STM32L1xx_HAL_Driver"
+}

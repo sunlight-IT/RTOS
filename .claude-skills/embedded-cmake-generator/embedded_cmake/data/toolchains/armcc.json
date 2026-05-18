@@ -13,6 +13,8 @@
     "CMAKE_LINKER": "{compiler_dir}/armlink.exe"
   },
   "executable_suffix": ".axf",
+  "link_library_suffix": ".a",
+  "static_library_suffix": ".a",
   "try_compile_target_type": "STATIC_LIBRARY",
   "cpu_flags": {
     "Cortex-M0": "--cpu=Cortex-M0",
@@ -26,8 +28,8 @@
   "fpu_flags": {
     "none": "",
     "softvfp": "--fpu=SoftVFP",
-    "fpv4-sp-d16": "--fpu=FPv4_SP",
-    "fpv5-sp-d16": "--fpu=FPv5_SP"
+    "fpv4-sp-d16": "--fpu=vfpv4",
+    "fpv5-sp-d16": "--fpu=vfpv5"
   },
   "flags": {
     "c_common": ["--c99"],
@@ -51,6 +53,24 @@
   },
   "link_libraries": [],
   "linker_script_option_template": "--scatter {path}",
+  "arch_mappings": {
+    "freertos": {
+      "Cortex-M0": "ARM_CM0",
+      "Cortex-M0+": "ARM_CM0",
+      "Cortex-M3": "ARM_CM3",
+      "Cortex-M4": "ARM_CM4F",
+      "Cortex-M7": "ARM_CM7",
+      "Cortex-M23": "ARM_CM23",
+      "Cortex-M33": "ARM_CM33"
+    },
+    "ucos": {
+      "Cortex-M0": "ARM-Cortex-M0",
+      "Cortex-M0+": "ARM-Cortex-M0",
+      "Cortex-M3": "ARM-Cortex-M3",
+      "Cortex-M4": "ARM-Cortex-M4",
+      "Cortex-M7": "ARM-Cortex-M7"
+    }
+  },
   "post_build": {
     "bin": {
       "command": ["{CMAKE_OBJCOPY}", "--bin", "--output", "{output_dir}/{project_name}.bin", "{target_file}"],

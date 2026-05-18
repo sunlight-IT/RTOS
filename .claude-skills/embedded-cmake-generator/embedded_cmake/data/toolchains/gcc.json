@@ -45,6 +45,24 @@
   },
   "link_libraries": ["c", "m", "nosys"],
   "linker_script_option_template": "-T{path}",
+  "arch_mappings": {
+    "freertos": {
+      "Cortex-M0": "ARM_CM0",
+      "Cortex-M0+": "ARM_CM0",
+      "Cortex-M3": "ARM_CM3",
+      "Cortex-M4": "ARM_CM4F",
+      "Cortex-M7": "ARM_CM7",
+      "Cortex-M23": "ARM_CM23",
+      "Cortex-M33": "ARM_CM33"
+    },
+    "ucos": {
+      "Cortex-M0": "ARM-Cortex-M0",
+      "Cortex-M0+": "ARM-Cortex-M0",
+      "Cortex-M3": "ARM-Cortex-M3",
+      "Cortex-M4": "ARM-Cortex-M4",
+      "Cortex-M7": "ARM-Cortex-M7"
+    }
+  },
   "post_build": {
     "hex": {
       "command": ["{CMAKE_OBJCOPY}", "-O", "ihex", "{target_file}", "{output_dir}/{project_name}.hex"],

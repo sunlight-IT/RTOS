@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "embedded-cmake-generator"
+version = "4.2.1"
+description = "Universal Embedded CMake Build System Generator — auto-detect Keil/CubeMX projects and generate CMake build files for ARMCC/GCC/Clang toolchains"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Embedded CMake Generator Contributors"},
+]
+keywords = ["embedded", "cmake", "keil", "stm32", "armcc", "gcc", "cubemx"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Embedded Systems",
+]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/anthropics/claude-code"
+Documentation = "https://github.com/anthropics/claude-code"
+
+[project.scripts]
+embedded-cmake-gen = "embedded_cmake.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["embedded_cmake*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.report]
+fail_under = 50
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]
+
+[tool.coverage.run]
+source = ["embedded_cmake"]

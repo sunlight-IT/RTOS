@@ -1,0 +1,3 @@
+interface:
+  display_name: "Embedded CMake Generator"
+  short_description: "Auto-generate CMake build for STM32/APM32/NXP projects from Keil/CubeMX"

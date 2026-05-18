@@ -1,0 +1,4 @@
+interface:
+  display_name: "Embedded CMake Generator"
+  short_description: "Auto-generate CMake build for STM32/APM32/NXP projects from Keil/CubeMX"
+  default_prompt: "Use embedded-cmake-generator to detect the current embedded project type, parse Keil/CubeMX configuration, and generate ARMCC/GCC dual-toolchain CMake build files with Cortex-Debug compatible DWARF paths."

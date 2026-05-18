@@ -1,0 +1,47 @@
+{
+  "family": "APM32E1",
+  "vendor": "Geehy",
+  "cpu": {
+    "core": "Cortex-M3",
+    "fpu": "none",
+    "endian": "little"
+  },
+  "models": {
+    "APM32E103RE": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "512K" },
+        { "name": "RAM", "origin": "0x20000000", "length": "128K" }
+      ],
+      "defines": ["__CPU_APM32", "STM32F10X_HD"],
+      "max_clock_hz": 96000000
+    },
+    "APM32E103C8": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "64K" },
+        { "name": "RAM", "origin": "0x20000000", "length": "20K" }
+      ],
+      "defines": ["__CPU_APM32", "STM32F10X_MD"],
+      "max_clock_hz": 96000000
+    }
+  },
+  "default_defines": ["USE_STDPERIPH_DRIVER"],
+  "header_paths": {
+    "cmsis_device": "source/CMSIS/Include",
+    "hal_driver": "source/Hardware/APM32/Drivers/inc"
+  },
+  "startup": {
+    "pattern": "source/Hardware/APM32/Startup/startup_*.s",
+    "gcc_default": "source/Hardware/APM32/Startup/startup_stm32f10x_hd.s",
+    "armcc_pattern": "source/Hardware/APM32/Startup/KeilMDK/**/*.s",
+    "armcc_default": "source/Hardware/APM32/Startup/KeilMDK/startup_stm32f10x_hd.s"
+  },
+  "linker": {
+    "gcc_pattern": "**/*FLASH*.ld",
+    "armcc_pattern": "**/APM32_APP.sct"
+  },
+  "hal_driver_name": "",
+  "ext": {
+    "stm32_compatible": true,
+    "note": "APM32E1xx is pin-compatible with STM32F10x but runs at 96MHz"
+  }
+}

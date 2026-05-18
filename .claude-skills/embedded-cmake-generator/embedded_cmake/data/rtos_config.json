@@ -1,0 +1,45 @@
+{
+  "freertos": {
+    "base_path": "Middlewares/Third_Party/FreeRTOS/Source",
+    "port_subdirs": {
+      "gcc": "portable/GCC",
+      "armcc": "portable/RVDS",
+      "iar": "portable/IAR"
+    },
+    "port_file": "port.c",
+    "cmsis_v1_dir": "CMSIS_RTOS",
+    "exclude_from_include_dirs": ["portable/GCC", "portable/RVDS", "portable/IAR"]
+  },
+  "ucos": {
+    "tc_dirs": {
+      "armcc": "RealView",
+      "gcc": "GNU",
+      "iar": "IAR"
+    },
+    "port_paths": {
+      "armcc": "uC-PORT/{arch}/Generic/RealView",
+      "gcc": "uC-PORT/{arch}/Generic/GNU",
+      "iar": "uC-PORT/{arch}/Generic/IAR"
+    },
+    "cpu_asm_candidates": [
+      "uC-CPU/{arch}/cpu_a.asm",
+      "uC-CPU/{arch}/{tc_dir}/cpu_a.s",
+      "uC-CPU/{arch}/{tc_dir}/cpu_a.asm"
+    ],
+    "port_asm_candidates": [
+      "uC-PORT/{arch}/Generic/{tc_dir}/os_cpu_a.asm",
+      "uC-CPU/{arch}/{tc_dir}/os_cpu_a.s",
+      "uC-CPU/{arch}/{tc_dir}/os_cpu_a.S"
+    ],
+    "port_swap_files": ["os_cpu_c.c", "os_dbg.c", "cpu_c.c"],
+    "defines": [
+      "CPU_CFG_DATA_SIZE=CPU_WORD_SIZE_32",
+      "CPU_CFG_DATA_SIZE_MAX=CPU_WORD_SIZE_64"
+    ]
+  },
+  "rtthread": {
+    "config_file": "rtconfig.h",
+    "build_system": "scons",
+    "feature_prefixes": ["RT_USING_", "BSP_USING_", "PKG_USING_"]
+  }
+}

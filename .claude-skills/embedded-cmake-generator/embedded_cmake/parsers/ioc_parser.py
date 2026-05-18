@@ -47,9 +47,12 @@ def parse_ioc(filepath: str) -> Dict[str, str]:
 def extract_chip_model(ioc_data: Dict[str, str]) -> Optional[str]:
     """Extract chip model name from .ioc data.
 
-    Priority: Mcu.CPN > Mcu.Name
+    Priority: Mcu.CPN > Mcu.UserName > Mcu.Name
     """
     name = ioc_data.get("Mcu.CPN")
+    if name:
+        return name
+    name = ioc_data.get("Mcu.UserName")
     if name:
         return name
     name = ioc_data.get("Mcu.Name")
@@ -125,4 +128,30 @@ def find_ioc_file(project_dir: str) -> Optional[str]:
     for f in os.listdir(project_dir):
         if f.endswith(".ioc"):
             return os.path.join(project_dir, f)
+    return None
+
+
+def find_cubemx_repo_root(ioc_filepath: str, max_depth: int = 8) -> Optional[str]:
+    """Walk up from a .ioc file directory looking for a ``Drivers/`` root.
+
+    CubeMX repositories follow a standard layout::
+
+        <repo_root>/
+            Drivers/
+                STM32xx_HAL_Driver/
+                CMSIS/
+            Projects/
+                <board>/<example>/
+
+    Returns the repo root path, or ``None`` if not found within ``max_depth``
+    parent directories.
+    """
+    current = os.path.dirname(os.path.abspath(ioc_filepath))
+    for _ in range(max_depth):
+        if os.path.isdir(os.path.join(current, "Drivers")):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
     return None

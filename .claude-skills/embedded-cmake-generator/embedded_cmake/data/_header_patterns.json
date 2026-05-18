@@ -1,0 +1,12 @@
+[
+  {"regex": "stm32f(\\d)xx\\.h", "family": "STM32F{0}"},
+  {"regex": "stm32l(\\d)xx\\.h", "family": "STM32L{0}"},
+  {"regex": "stm32g(\\d)xx\\.h", "family": "STM32G{0}"},
+  {"regex": "stm32h(\\d)xx\\.h", "family": "STM32H{0}"},
+  {"regex": "gd32f(\\w+)\\.h", "family": "GD32F{0}"},
+  {"regex": "apm32e(\\w+)\\.h", "family": "APM32E{0}"},
+  {"regex": "apm32f(\\w+)\\.h", "family": "APM32F{0}"},
+  {"regex": "MKL(\\w+)Z(\\d+)\\.h", "family": "Kinetis_KL{0}"},
+  {"regex": "MK(\\w+)Fn?(\\w+)\\.h", "family": "MK{0}{1}"},
+  {"regex": "tm4c(\\w+)\\.h", "family": "TM4C{0}"}
+]

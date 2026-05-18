@@ -1,7 +1,7 @@
 {
   "name": "embedded-cmake-generator",
-  "version": "3.0.0",
-  "description": "STM32项目CMake工程自动生成器，自动扫描项目并生成完整的CMake构建系统",
+  "version": "4.1.3",
+  "description": "通用嵌入式CMake构建系统生成器, 支持Keil/CubeMX项目解析, 多芯片, 多RTOS, 多工具链",
   "main": "SKILL.md",
   "readme": "README.md",
   "scripts": {
@@ -9,10 +9,17 @@
   },
   "keywords": [
     "embedded",
-    "stm32",
     "cmake",
+    "keil",
     "build-system",
-    "cmake-generator"
+    "cmake-generator",
+    "armcc",
+    "gcc",
+    "ucos",
+    "freertos",
+    "stm32",
+    "apm32",
+    "nxp"
   ],
   "author": "",
   "license": "MIT"

@@ -1,0 +1,47 @@
+{
+  "family": "MK64",
+  "vendor": "NXP",
+  "cpu": {
+    "core": "Cortex-M4",
+    "fpu": "fpv4-sp-d16",
+    "endian": "little"
+  },
+  "models": {
+    "MK64FN1M0VMD12": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x00000000", "length": "1M" },
+        { "name": "RAM", "origin": "0x1FFF0000", "length": "256K" }
+      ],
+      "defines": ["CPU_MK64FN1M0VMD12"],
+      "max_clock_hz": 120000000
+    },
+    "MK64FX512VMD12": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x00000000", "length": "512K" },
+        { "name": "RAM", "origin": "0x1FFF0000", "length": "128K" }
+      ],
+      "defines": ["CPU_MK64FX512VMD12"],
+      "max_clock_hz": 120000000
+    }
+  },
+  "default_defines": ["__CPU_MK64"],
+  "header_paths": {
+    "cmsis_device": "Drivers/CMSIS/Include",
+    "hal_driver": ""
+  },
+  "startup": {
+    "pattern": "startup_MK64F12.s",
+    "gcc_default": "startup_MK64F12.S",
+    "armcc_pattern": "**/arm/startup_MK64F12.s",
+    "armcc_default": ""
+  },
+  "linker": {
+    "gcc_pattern": "MK64FN1M0*.ld",
+    "armcc_pattern": "MK64*.sct"
+  },
+  "hal_driver_name": "MK64F12",
+  "ext": {
+    "dsp_instructions": true,
+    "note": "NXP Kinetis K64 series with FPU"
+  }
+}

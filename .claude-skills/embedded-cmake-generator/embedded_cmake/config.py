@@ -151,6 +151,31 @@ def merge_configs(
     if "size" in output:
         config.output_size = output["size"]
 
+    # Lib files (pre-compiled .lib files for Keil projects)
+    user_libs = user_data.get("lib_files", [])
+    if isinstance(user_libs, list) and user_libs:
+        for lib in user_libs:
+            if lib not in config.lib_files:
+                config.lib_files.append(lib)
+
+    # Board / CPU
+    if user_data.get("board"):
+        config.board_name = user_data["board"]
+    if user_data.get("cpu"):
+        config.cpu_name = user_data["cpu"]
+
+    # Keil project file
+    if user_data.get("keil_project_file"):
+        config.keil_project_file = user_data["keil_project_file"]
+
+    # User-defined chip header patterns
+    user_patterns = user_data.get("chip_header_patterns", [])
+    if isinstance(user_patterns, list) and user_patterns:
+        for p in user_patterns:
+            if isinstance(p, dict) and "regex" in p and "family" in p:
+                if p not in config.extra_header_patterns:
+                    config.extra_header_patterns.append(p)
+
 
 def _resolve_chip(config: ProjectConfig, chip_db: ChipDB) -> None:
     """Resolve chip family/model to a ChipInfo from the database."""
@@ -181,18 +206,27 @@ def _resolve_chip(config: ProjectConfig, chip_db: ChipDB) -> None:
 
 
 def _merge_scan_config(scan: ScanConfig, data: Dict[str, Any]) -> None:
-    """Merge user scan config into ScanConfig (in-place)."""
+    """Merge user scan config into ScanConfig (in-place).
+
+    List fields (exclude_dirs, exclude_files, etc.) are extended by default.
+    Items prefixed with ``-`` are **removed** from the target list instead.
+    """
     if "source_extensions" in data:
         scan.source_extensions = data["source_extensions"]
     if "header_extensions" in data:
         scan.header_extensions = data["header_extensions"]
-    # Lists are extended
+    # Lists are extended (or removed with '-' prefix)
     for key in ["exclude_dirs", "exclude_dir_patterns", "exclude_files",
                  "exclude_file_patterns", "extra_exclude_header_dirs"]:
         if key in data:
+            target_list = getattr(scan, key)
             for item in data[key]:
-                if item not in getattr(scan, key):
-                    getattr(scan, key).append(item)
+                if isinstance(item, str) and item.startswith("-"):
+                    name = item[1:]
+                    if name in target_list:
+                        target_list.remove(name)
+                elif item not in target_list:
+                    target_list.append(item)
 
 
 def _merge_rtos_config(rtos: RTOSConfig, data: Dict[str, Any]) -> None:

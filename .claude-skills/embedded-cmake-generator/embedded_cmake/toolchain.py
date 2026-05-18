@@ -6,11 +6,11 @@ for specific chip configurations.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from .models import ToolchainConfig, PostBuildConfig, PostBuildStep, CpuInfo
+from .json_registry import JsonRegistry
+from .models import CpuInfo, PostBuildConfig, PostBuildStep, ToolchainConfig
 
 
 def _default_data_dir() -> Path:
@@ -19,7 +19,6 @@ def _default_data_dir() -> Path:
 
 
 def _parse_post_build(data: Optional[dict]) -> PostBuildConfig:
-    """Parse post-build configuration from JSON dict."""
     if not data:
         return PostBuildConfig()
     return PostBuildConfig(
@@ -30,7 +29,6 @@ def _parse_post_build(data: Optional[dict]) -> PostBuildConfig:
 
 
 def _parse_post_build_step(data: Optional[dict]) -> Optional[PostBuildStep]:
-    """Parse a single post-build step."""
     if not data:
         return None
     return PostBuildStep(
@@ -50,9 +48,12 @@ def _parse_toolchain_json(data: dict) -> ToolchainConfig:
         compiler_prefix=data.get("compiler_prefix", ""),
         tools=data.get("tools", {}),
         executable_suffix=data.get("executable_suffix", ".elf"),
+        link_library_suffix=data.get("link_library_suffix", ".a"),
+        static_library_suffix=data.get("static_library_suffix", ".a"),
         try_compile_target_type=data.get("try_compile_target_type", "STATIC_LIBRARY"),
         cpu_flags=data.get("cpu_flags", {}),
         fpu_flags=data.get("fpu_flags", {}),
+        arch_mappings=data.get("arch_mappings", {}),
         flags=data.get("flags", {}),
         link_libraries=data.get("link_libraries", []),
         linker_script_option_template=data.get("linker_script_option_template", "-T{path}"),
@@ -61,71 +62,39 @@ def _parse_toolchain_json(data: dict) -> ToolchainConfig:
     )
 
 
-class ToolchainRegistry:
+class ToolchainRegistry(JsonRegistry[ToolchainConfig]):
     """Registry of toolchain definitions loaded from JSON files.
 
     Usage::
 
         reg = ToolchainRegistry()
+        reg.add_search_path(Path("path/to/toolchains"))
         reg.load_builtin()
         gcc = reg.get("gcc")
         flags = gcc.resolve_cpu_flags(CpuInfo(core="Cortex-M3", fpu="none"))
     """
 
     def __init__(self, search_paths: Optional[List[Path]] = None):
-        self._toolchains: Dict[str, ToolchainConfig] = {}
-        self._search_paths: List[Path] = list(search_paths or [])
+        super().__init__(search_paths)
 
-    def add_search_path(self, path: Path) -> None:
-        """Add a search path for JSON toolchain files."""
-        if path not in self._search_paths:
-            self._search_paths.append(path)
+    # -- JsonRegistry hooks -----------------------------------------------
+
+    def _parse_item(self, data: dict) -> ToolchainConfig:
+        return _parse_toolchain_json(data)
+
+    def _register_item(self, item: ToolchainConfig) -> None:
+        self._items[item.toolchain_id] = item
 
     def load_builtin(self) -> int:
-        """Load all built-in toolchain definitions. Returns count of files loaded."""
-        self._search_paths.append(_default_data_dir())
+        """Load built-in toolchain definitions."""
+        self.add_search_path(_default_data_dir())
         return self._load_from_paths()
 
-    def load_path(self, path: Path) -> int:
-        """Load toolchain JSON files from a specific directory."""
-        count = 0
-        if path.is_dir():
-            for f in sorted(path.glob("*.json")):
-                self._load_file(f)
-                count += 1
-        return count
-
-    def _load_from_paths(self) -> int:
-        """Load from all registered search paths."""
-        count = 0
-        for path in self._search_paths:
-            count += self.load_path(path)
-        return count
-
-    def _load_file(self, filepath: Path) -> Optional[ToolchainConfig]:
-        """Load a single toolchain JSON file."""
-        try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            tc = _parse_toolchain_json(data)
-            self.register(tc)
-            return tc
-        except (json.JSONDecodeError, KeyError, TypeError) as e:
-            import sys
-            print(f"[WARN] Failed to load toolchain file {filepath}: {e}", file=sys.stderr)
-            return None
-
-    def register(self, tc: ToolchainConfig) -> None:
-        """Register a ToolchainConfig."""
-        self._toolchains[tc.toolchain_id] = tc
+    # -- lookup API -------------------------------------------------------
 
     def get(self, toolchain_id: str) -> Optional[ToolchainConfig]:
         """Get a toolchain by ID (e.g. 'gcc', 'armcc')."""
-        return self._toolchains.get(toolchain_id)
-
-    def list_ids(self) -> List[str]:
-        """List all registered toolchain IDs."""
-        return sorted(self._toolchains.keys())
+        return self._items.get(toolchain_id)
 
     def resolve_flags(self, toolchain_id: str, cpu: CpuInfo) -> str:
         """Resolve CPU + FPU flags for a specific toolchain and CPU."""
@@ -140,9 +109,3 @@ class ToolchainRegistry:
         if not tc:
             return f"-T{path}"
         return tc.linker_script_option_template.format(path=path)
-
-    def __len__(self) -> int:
-        return len(self._toolchains)
-
-    def __contains__(self, toolchain_id: str) -> bool:
-        return toolchain_id in self._toolchains

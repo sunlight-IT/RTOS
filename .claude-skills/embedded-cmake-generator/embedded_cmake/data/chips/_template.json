@@ -1,0 +1,39 @@
+{
+  "_comment": "Template for adding new chip families. Copy this file, fill in the values, and place in the data/chips/ directory.",
+  "family": "YOUR_FAMILY",
+  "vendor": "YOUR_VENDOR",
+  "cpu": {
+    "core": "Cortex-M3",
+    "fpu": "none",
+    "endian": "little"
+  },
+  "models": {
+    "YOUR_CHIP_MODEL": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "512K" },
+        { "name": "RAM", "origin": "0x20000000", "length": "64K" }
+      ],
+      "defines": ["YOUR_DEFINE"],
+      "max_clock_hz": 72000000
+    }
+  },
+  "default_defines": ["YOUR_DEFAULT_DEFINE"],
+  "header_paths": {
+    "cmsis_device": "path/to/cmsis/include",
+    "hal_driver": "path/to/hal/driver/inc"
+  },
+  "startup": {
+    "pattern": "path/to/startup_*.s",
+    "gcc_default": "path/to/startup_file.s",
+    "armcc_pattern": "path/to/arm/startup_file.s",
+    "armcc_default": "path/to/startup_file.s"
+  },
+  "linker": {
+    "gcc_pattern": "*FLASH*.ld",
+    "armcc_pattern": "*.sct"
+  },
+  "hal_driver_name": "YOUR_HAL_DRIVER",
+  "ext": {
+    "note": "Add any vendor-specific data here"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "family": "STM32G4",
+  "vendor": "STMicroelectronics",
+  "cpu": {
+    "core": "Cortex-M4",
+    "fpu": "fpv4-sp-d16",
+    "endian": "little"
+  },
+  "models": {
+    "STM32G431K6Ux": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "32K" },
+        { "name": "RAM",   "origin": "0x20000000", "length": "32K" }
+      ],
+      "defines": ["STM32G431xx"],
+      "max_clock_hz": 170000000
+    },
+    "STM32G431K8Ux": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "64K" },
+        { "name": "RAM",   "origin": "0x20000000", "length": "32K" }
+      ],
+      "defines": ["STM32G431xx"],
+      "max_clock_hz": 170000000
+    },
+    "STM32G473xx": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "512K" },
+        { "name": "RAM",   "origin": "0x20000000", "length": "128K" }
+      ],
+      "defines": ["STM32G473xx"],
+      "max_clock_hz": 170000000
+    },
+    "STM32G474xx": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "512K" },
+        { "name": "RAM",   "origin": "0x20000000", "length": "128K" }
+      ],
+      "defines": ["STM32G474xx"],
+      "max_clock_hz": 170000000
+    }
+  },
+  "default_defines": [],
+  "header_paths": {
+    "cmsis_device": "Drivers/CMSIS/Device/ST/STM32G4xx/Include",
+    "hal_driver": "Drivers/STM32G4xx_HAL_Driver/Inc"
+  },
+  "startup": {
+    "pattern": "startup_stm32g431xx.s",
+    "gcc_default": "startup_stm32g431xx.s",
+    "armcc_pattern": "MDK-ARM/startup_stm32g431xx.s",
+    "armcc_default": "MDK-ARM/startup_stm32g431xx.s"
+  },
+  "linker": {
+    "gcc_pattern": "*STM32G431xx*.ld",
+    "armcc_pattern": "*.sct"
+  },
+  "hal_driver_name": "STM32G4xx_HAL_Driver"
+}

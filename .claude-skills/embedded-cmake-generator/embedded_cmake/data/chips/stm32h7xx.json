@@ -1,0 +1,47 @@
+{
+  "family": "STM32H7",
+  "vendor": "STMicroelectronics",
+  "cpu": {
+    "core": "Cortex-M7",
+    "fpu": "fpv5-sp-d16",
+    "endian": "little"
+  },
+  "models": {
+    "STM32H743ZITx": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "2048K" },
+        { "name": "RAM", "origin": "0x24000000", "length": "512K" },
+        { "name": "DTCM", "origin": "0x20000000", "length": "128K" },
+        { "name": "ITCM", "origin": "0x00000000", "length": "64K" }
+      ],
+      "defines": ["STM32H743xx"],
+      "max_clock_hz": 480000000
+    },
+    "STM32H750VBTx": {
+      "memory": [
+        { "name": "FLASH", "origin": "0x08000000", "length": "128K" },
+        { "name": "RAM", "origin": "0x24000000", "length": "512K" },
+        { "name": "DTCM", "origin": "0x20000000", "length": "128K" },
+        { "name": "ITCM", "origin": "0x00000000", "length": "64K" }
+      ],
+      "defines": ["STM32H750xx"],
+      "max_clock_hz": 480000000
+    }
+  },
+  "default_defines": ["USE_HAL_DRIVER", "CORE_CM7"],
+  "header_paths": {},
+  "startup": {
+    "pattern": "startup_stm32h7*.s",
+    "gcc_default": "startup_stm32h743xx.s",
+    "armcc_pattern": "startup_stm32h7*.s",
+    "armcc_default": "startup_stm32h7xx.s"
+  },
+  "linker": {
+    "gcc_pattern": "*FLASH*.ld",
+    "armcc_pattern": "*.sct"
+  },
+  "hal_driver_name": "STM32H7xx_HAL_Driver",
+  "ext": {
+    "note": "STM32H7 family - Cortex-M7 with double-precision FPU. Complex memory layout with DTCM/ITCM/AXI SRAM domains."
+  }
+}
